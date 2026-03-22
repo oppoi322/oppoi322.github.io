@@ -4,14 +4,21 @@
   <meta charset="utf-8">
   
   
-  <title>Hexo</title>
+  <title>把 Hexo 首页从“全文展开”改成“标题列表” | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/index.html">
+  <meta name="description" content="我一开始打开首页时，主题会把每篇文章的正文直接渲染出来（看起来像“所有文章都展开了”）。我更希望首页只展示标题，点击标题后再看全文。 改法（landscape 主题）这个站点使用的是 landscape 主题。 首页模板在：  themes&#x2F;landscape&#x2F;layout&#x2F;index.ejs  原来是： 1&lt;%- partial(&#x27;_partial&#x2F;archive&#x27;,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="把 Hexo 首页从“全文展开”改成“标题列表”">
+<meta property="og:url" content="http://example.com/2026/03/22/make-homepage-title-list/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="我一开始打开首页时，主题会把每篇文章的正文直接渲染出来（看起来像“所有文章都展开了”）。我更希望首页只展示标题，点击标题后再看全文。 改法（landscape 主题）这个站点使用的是 landscape 主题。 首页模板在：  themes&#x2F;landscape&#x2F;layout&#x2F;index.ejs  原来是： 1&lt;%- partial(&#x27;_partial&#x2F;archive&#x27;,">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-03-22T15:21:00.000Z">
+<meta property="article:modified_time" content="2026-03-22T07:23:45.879Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Hexo">
+<meta property="article:tag" content="landscape">
+<meta property="article:tag" content="主题">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -69,96 +76,92 @@
 </header>
 
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2026" class="archive-year">2026</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2026/03/22/make-homepage-title-list/" class="archive-article-date">
-  <time class="dt-published" datetime="2026-03-22T15:21:00.000Z" itemprop="datePublished">Mar 22</time>
+        <section id="main"><article id="post-make-homepage-title-list" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/03/22/make-homepage-title-list/" class="article-date">
+  <time class="dt-published" datetime="2026-03-22T15:21:00.000Z" itemprop="datePublished">2026-03-22</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2026/03/22/make-homepage-title-list/">把 Hexo 首页从“全文展开”改成“标题列表”</a>
+    <h1 class="p-name article-title" itemprop="headline name">
+      把 Hexo 首页从“全文展开”改成“标题列表”
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+      </header>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2026/03/22/how-i-added-comments-with-utterances/" class="archive-article-date">
-  <time class="dt-published" datetime="2026-03-22T15:13:00.000Z" itemprop="datePublished">Mar 22</time>
-</a>
+    <div class="e-content article-entry" itemprop="articleBody">
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2026/03/22/how-i-added-comments-with-utterances/">给 Hexo + GitHub Pages 加评论：utterances（用 GitHub Issues 作为评论存储）</a>
-    </h1>
-  
+        <p>我一开始打开首页时，主题会把每篇文章的正文直接渲染出来（看起来像“所有文章都展开了”）。我更希望首页只展示标题，点击标题后再看全文。</p>
+<h2 id="改法（landscape-主题）"><a href="#改法（landscape-主题）" class="headerlink" title="改法（landscape 主题）"></a>改法（landscape 主题）</h2><p>这个站点使用的是 <code>landscape</code> 主题。</p>
+<p>首页模板在：</p>
+<ul>
+<li><code>themes/landscape/layout/index.ejs</code></li>
+</ul>
+<p>原来是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;%- partial(&#x27;_partial/archive&#x27;, &#123;expand: true, index: true&#125;) %&gt;</span><br></pre></td></tr></table></figure>
 
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2026/03/22/how-i-deployed-this-hexo-blog/" class="archive-article-date">
-  <time class="dt-published" datetime="2026-03-22T14:20:00.000Z" itemprop="datePublished">Mar 22</time>
-</a>
+<p>把 <code>expand: true</code> 改成 <code>expand: false</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;%- partial(&#x27;_partial/archive&#x27;, &#123;expand: false, index: true&#125;) %&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这样首页就会走“归档列表”渲染逻辑：只显示日期 + 标题，不再输出每篇文章的 <code>post.content</code>。</p>
+<h2 id="额外补充"><a href="#额外补充" class="headerlink" title="额外补充"></a>额外补充</h2><p>为了以后在列表页控制摘要，我顺便在根配置 <code>_config.yml</code> 加了：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">excerpt_separator:</span> <span class="string">&quot;&lt;!-- more --&gt;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>之后写文章时插入 <code>&lt;!-- more --&gt;</code>，就可以让列表页只显示摘要部分。</p>
+
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2026/03/22/how-i-deployed-this-hexo-blog/">我是如何把这个 Hexo 博客部署到 GitHub Pages（oppoi322.github.io）</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2026/03/22/hello-world/" class="archive-article-date">
-  <time class="dt-published" datetime="2026-03-22T07:23:45.879Z" itemprop="datePublished">Mar 22</time>
-</a>
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/03/22/make-homepage-title-list/" data-id="cuidRT5siDes8ggt9CW-AmhGc" data-title="把 Hexo 首页从“全文展开”改成“标题列表”" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2026/03/22/hello-world/">Hello World</a>
-    </h1>
-  
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/landscape/" rel="tag">landscape</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%B8%BB%E9%A2%98/" rel="tag">主题</a></li></ul>
 
-    </header>
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2026/03/22/how-i-added-comments-with-utterances/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">给 Hexo + GitHub Pages 加评论：utterances（用 GitHub Issues 作为评论存储）</div>
+    </a>
+  
+</nav>
+
+  
 </article>
+
+
+
+
+
   
-  
-    </div></section>
-  
+  <section id="comments" class="utterances">
+    <h2>Comments</h2>
+    <script
+      src="https://utteranc.es/client.js"
+      repo="oppoi322/oppoi322.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
 
 
 </section>
