@@ -71,6 +71,150 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-how-i-added-comments-with-utterances" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/03/22/how-i-added-comments-with-utterances/" class="article-date">
+  <time class="dt-published" datetime="2026-03-22T15:13:00.000Z" itemprop="datePublished">2026-03-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2026/03/22/how-i-added-comments-with-utterances/">给 Hexo + GitHub Pages 加评论：utterances（用 GitHub Issues 作为评论存储）</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>这个博客是跑在 GitHub Pages 上的静态站点：它只有 HTML&#x2F;CSS&#x2F;JS 文件，没有数据库、也没有后端服务进程。</p>
+<p>因此“评论”这种需要 <strong>写入&#x2F;保存</strong> 的功能，必须把数据存到别的地方（第三方服务、云函数、或某种可写存储）。我最终采用的是 <strong>utterances</strong>：</p>
+<ul>
+<li>评论 UI 在文章页下方（读者不需要跳去 GitHub 页面操作）</li>
+<li>评论数据存储在 GitHub 仓库的 <strong>Issues</strong> 里（每篇文章对应一个 Issue 线程）</li>
+<li>读者评论时需要 GitHub 登录（防垃圾、也更省事）</li>
+</ul>
+<p>本文记录接入过程，以及它背后大概用了哪些 GitHub 能力。</p>
+<h2 id="1-为什么静态站点“天然没有评论”"><a href="#1-为什么静态站点“天然没有评论”" class="headerlink" title="1. 为什么静态站点“天然没有评论”"></a>1. 为什么静态站点“天然没有评论”</h2><p>静态站点部署到 GitHub Pages 后：</p>
+<ul>
+<li>浏览器只能 <strong>GET</strong> 到页面文件</li>
+<li>没有一个可以 <strong>POST</strong> 新评论、写数据库的后端</li>
+</ul>
+<p>所以评论系统通常两种路线：</p>
+<ol>
+<li><strong>接第三方评论服务</strong>（它提供后端 + 存储）</li>
+<li><strong>自己搭一个后端</strong>（云函数 &#x2F; serverless 也行）</li>
+</ol>
+<p>utterances 属于一种很巧妙的“第三条路”：把 GitHub Issues 当成数据库。</p>
+<h2 id="2-utterances-的工作原理（概念版）"><a href="#2-utterances-的工作原理（概念版）" class="headerlink" title="2. utterances 的工作原理（概念版）"></a>2. utterances 的工作原理（概念版）</h2><p>当你打开某篇文章时，页面底部会加载一段脚本：</p>
+<ul>
+<li>它会根据文章的唯一标识（我们用的是 <code>pathname</code>）</li>
+<li>在指定仓库里找到对应的 Issue<ul>
+<li>找到了：就把 Issue 下面的评论渲染出来</li>
+<li>没找到：首次评论时会自动创建一个 Issue，然后再把评论写进去</li>
+</ul>
+</li>
+</ul>
+<p>你在页面里发的每条评论，本质上都会变成 GitHub 上该 Issue 的一条 <strong>comment</strong>。</p>
+<h3 id="“每篇文章一个-Issue”是怎么做到的？"><a href="#“每篇文章一个-Issue”是怎么做到的？" class="headerlink" title="“每篇文章一个 Issue”是怎么做到的？"></a>“每篇文章一个 Issue”是怎么做到的？</h3><p>utterances 支持多种映射策略（<code>issue_term</code>）：</p>
+<ul>
+<li><code>pathname</code>：用文章路径作为 key（当前站点使用）</li>
+<li><code>url</code>：用完整 URL</li>
+<li><code>title</code> &#x2F; <code>og:title</code>：用标题</li>
+</ul>
+<p>我们选择 <code>pathname</code> 的直觉原因是：</p>
+<ul>
+<li>同一篇文章的路径固定时，评论线程就固定</li>
+<li>不需要依赖标题（标题改了可能导致映射变化）</li>
+</ul>
+<h2 id="3-为什么要在-GitHub-上“Install-App”？"><a href="#3-为什么要在-GitHub-上“Install-App”？" class="headerlink" title="3. 为什么要在 GitHub 上“Install App”？"></a>3. 为什么要在 GitHub 上“Install App”？</h2><p>这不是下载到电脑上的那种 App，而是 <strong>GitHub App 授权</strong>。</p>
+<p>原因：</p>
+<ul>
+<li>评论要写入 Issues，属于“写操作”</li>
+<li>GitHub 必须确保这是一个被授权的应用在操作仓库资源</li>
+</ul>
+<p>安装时建议选择：</p>
+<ul>
+<li><strong>Only select repositories</strong> → 只授权 <code>oppoi322/oppoi322.github.io</code> 这一个仓库</li>
+</ul>
+<p>这样权限范围最小。</p>
+<h2 id="4-我在-Hexo-里做了哪些改动"><a href="#4-我在-Hexo-里做了哪些改动" class="headerlink" title="4. 我在 Hexo 里做了哪些改动"></a>4. 我在 Hexo 里做了哪些改动</h2><p>Hexo 的 <code>landscape</code> 主题原生只有 Disqus &#x2F; Valine 的插槽，没有 utterances。</p>
+<p>因此我做了三件事：</p>
+<h3 id="4-1-把主题放进仓库（便于自定义）"><a href="#4-1-把主题放进仓库（便于自定义）" class="headerlink" title="4.1 把主题放进仓库（便于自定义）"></a>4.1 把主题放进仓库（便于自定义）</h3><p>把 <code>themes/landscape/</code> 放进源码仓库，让 GitHub Actions 构建时也能拿到我们修改过的模板。</p>
+<h3 id="4-2-新增-utterances-的模板片段"><a href="#4-2-新增-utterances-的模板片段" class="headerlink" title="4.2 新增 utterances 的模板片段"></a>4.2 新增 utterances 的模板片段</h3><p>新增文件：</p>
+<ul>
+<li><code>themes/landscape/layout/_partial/comments/utterances.ejs</code></li>
+</ul>
+<p>里面就是 utterances 官方提供的嵌入脚本（略微参数化）：</p>
+<ul>
+<li><code>repo</code>：评论存储的仓库</li>
+<li><code>issue-term</code>：映射策略</li>
+<li><code>theme</code>：评论区主题</li>
+</ul>
+<h3 id="4-3-在文章页模板里插入评论区"><a href="#4-3-在文章页模板里插入评论区" class="headerlink" title="4.3 在文章页模板里插入评论区"></a>4.3 在文章页模板里插入评论区</h3><p>在文章页模板（<code>themes/landscape/layout/_partial/article.ejs</code>）末尾加入：</p>
+<ul>
+<li>仅在“文章详情页”显示（不是首页列表）</li>
+<li>仅在该文章允许评论时显示</li>
+</ul>
+<p>这样评论区会出现在正文后面。</p>
+<h3 id="4-4-在主题配置里加-utterances-配置"><a href="#4-4-在主题配置里加-utterances-配置" class="headerlink" title="4.4 在主题配置里加 utterances 配置"></a>4.4 在主题配置里加 utterances 配置</h3><p>在 <code>themes/landscape/_config.yml</code> 里加了：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">utterances:</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">oppoi322/oppoi322.github.io</span></span><br><span class="line">  <span class="attr">issue_term:</span> <span class="string">pathname</span></span><br><span class="line">  <span class="attr">theme:</span> <span class="string">github-light</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="5-这套方案用到了哪些-GitHub-能力（API-视角）"><a href="#5-这套方案用到了哪些-GitHub-能力（API-视角）" class="headerlink" title="5. 这套方案用到了哪些 GitHub 能力（API 视角）"></a>5. 这套方案用到了哪些 GitHub 能力（API 视角）</h2><p>从效果上看，utterances 主要依赖的是：</p>
+<ul>
+<li><strong>GitHub Issues</strong>：作为“每篇文章一个线程”的存储</li>
+<li><strong>Issue Comments</strong>：评论本体</li>
+<li><strong>GitHub App 授权</strong>：让脚本能安全地读写 Issues</li>
+</ul>
+<p>具体到 API 层面（不用你自己写 API 调用，utterances 都封装好了），大致会涉及：</p>
+<ul>
+<li>查询&#x2F;创建 Issue</li>
+<li>查询&#x2F;创建 Issue Comment</li>
+</ul>
+<p>你在页面里看到的“回复某条评论”，其实就是在对应 Issue 里继续回复（同一个线程下的评论流）。</p>
+<h2 id="6-优缺点"><a href="#6-优缺点" class="headerlink" title="6. 优缺点"></a>6. 优缺点</h2><p>优点：</p>
+<ul>
+<li>不用自建服务器&#x2F;数据库</li>
+<li>评论天然带账号体系（减少垃圾评论）</li>
+<li>评论数据在你自己的 GitHub 仓库里，可导出、可管理</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>评论者需要 GitHub 登录（不是完全匿名）</li>
+<li>仓库里会多出一些 Issues（这就是评论存储的代价）</li>
+</ul>
+<hr>
+<p>如果你也想给自己的 <code>xxx.github.io</code> 加评论：utterances 是“最轻量、最不需要运维”的路线之一。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/03/22/how-i-added-comments-with-utterances/" data-id="cuidjhEv1wCeK_MjHvNtDe5xf" data-title="给 Hexo + GitHub Pages 加评论：utterances（用 GitHub Issues 作为评论存储）" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/utterances/" rel="tag">utterances</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" rel="tag">评论系统</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+
+
+  
     <article id="post-how-i-deployed-this-hexo-blog" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2026/03/22/how-i-deployed-this-hexo-blog/" class="article-date">
@@ -171,7 +315,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/03/22/how-i-deployed-this-hexo-blog/" data-id="cuidu9cxiLrkDcRZ_7exH8G-P" data-title="我是如何把这个 Hexo 博客部署到 GitHub Pages（oppoi322.github.io）" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2026/03/22/how-i-deployed-this-hexo-blog/" data-id="cuidJwq4q5dlI76Saaxa6pw9c" data-title="我是如何把这个 Hexo 博客部署到 GitHub Pages（oppoi322.github.io）" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -190,7 +334,7 @@
     <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2026/03/22/hello-world/" class="article-date">
-  <time class="dt-published" datetime="2026-03-22T07:06:38.912Z" itemprop="datePublished">2026-03-22</time>
+  <time class="dt-published" datetime="2026-03-22T07:14:09.667Z" itemprop="datePublished">2026-03-22</time>
 </a>
     
   </div>
@@ -226,7 +370,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/03/22/hello-world/" data-id="cuidCWaoijRbTV56sgPszirPw" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2026/03/22/hello-world/" data-id="cuidr1lUiRHTAHEgHB2BByZ-l" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -260,7 +404,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/GitHub-Actions/" rel="tag">GitHub Actions</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%83%A8%E7%BD%B2/" rel="tag">部署</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/GitHub-Actions/" rel="tag">GitHub Actions</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/utterances/" rel="tag">utterances</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" rel="tag">评论系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%83%A8%E7%BD%B2/" rel="tag">部署</a></li></ul>
     </div>
   </div>
 
@@ -270,7 +414,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/GitHub-Actions/" style="font-size: 10px;">GitHub Actions</a> <a href="/tags/GitHub-Pages/" style="font-size: 10px;">GitHub Pages</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/%E9%83%A8%E7%BD%B2/" style="font-size: 10px;">部署</a>
+      <a href="/tags/GitHub-Actions/" style="font-size: 10px;">GitHub Actions</a> <a href="/tags/GitHub-Pages/" style="font-size: 20px;">GitHub Pages</a> <a href="/tags/Hexo/" style="font-size: 20px;">Hexo</a> <a href="/tags/utterances/" style="font-size: 10px;">utterances</a> <a href="/tags/%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">评论系统</a> <a href="/tags/%E9%83%A8%E7%BD%B2/" style="font-size: 10px;">部署</a>
     </div>
   </div>
 
@@ -290,6 +434,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2026/03/22/how-i-added-comments-with-utterances/">给 Hexo + GitHub Pages 加评论：utterances（用 GitHub Issues 作为评论存储）</a>
+          </li>
         
           <li>
             <a href="/2026/03/22/how-i-deployed-this-hexo-blog/">我是如何把这个 Hexo 博客部署到 GitHub Pages（oppoi322.github.io）</a>
