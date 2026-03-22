@@ -367,10 +367,7 @@
     // ----- Mobile UI (oval table)
     // If elements exist (mobile-only), update them too.
     if(document.getElementById('m-community')){
-      $('m-street').textContent = streetName(GAME.street);
       $('m-pot').textContent = fmt(GAME.pot);
-      $('m-currentBet').textContent = fmt(GAME.currentBet);
-      $('m-turn').textContent = GAME.seats[GAME.toAct]?.name || '-';
 
       const mcc = $('m-community');
       mcc.innerHTML='';
@@ -403,11 +400,13 @@
 
         const row2=document.createElement('div');
         row2.className='row2';
-        row2.innerHTML = `<span>${escapeHtml(styleName)}</span><span>${stateMark}</span>`;
+        // show bet or folded/all-in state
+        const betOrState = stateMark || `下注 ${fmt(s.bet)}`;
+        row2.innerHTML = `<span>${escapeHtml(styleName)}</span><span>${betOrState}</span>`;
 
         const row2b=document.createElement('div');
         row2b.className='row2';
-        row2b.innerHTML = `<span>筹码 ${fmt(s.stack)}</span><span>下注 ${fmt(s.bet)}</span>`;
+        row2b.innerHTML = `<span>余额 ${fmt(s.stack)}</span><span></span>`;
 
         const row3=document.createElement('div');
         row3.className='row3';
@@ -430,12 +429,6 @@
       const v = Number($('raiseAmount').value||0);
       if(!Number.isNaN(v)) $('m-raiseAmount').value = String(v);
 
-      // mobile log last lines
-      const mlog = $('m-log');
-      if(mlog){
-        const lines = Array.from($('log').children).slice(-10).map(x=>x.textContent||'');
-        mlog.textContent = lines.join('\n');
-      }
     }
   }
 
@@ -903,13 +896,6 @@
         $('raiseAmount').value = String((mAmt).value||0);
       });
 
-      const t = document.getElementById('btnToggleLog');
-      if(t){
-        t.addEventListener('click', ()=>{
-          const box = $('m-log');
-          box.hidden = !box.hidden;
-        });
-      }
     }
 
     document.querySelectorAll('.chip').forEach(btn=>{
