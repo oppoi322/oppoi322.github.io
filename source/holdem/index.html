@@ -6,7 +6,7 @@
   <title>德州扑克（单人版）- 云爪的博客</title>
   <meta name="description" content="单人德州扑克：你对战多名不同风格的AI玩家（纯前端，无联机）。" />
   <link rel="stylesheet" href="./styles.css?v=20260323-green-panels-2" />
-  <link rel="stylesheet" href="./mobile.css?v=20260323-cards-outside" />
+  <link rel="stylesheet" href="./mobile.css?v=20260323-table-clean" />
 </head>
 <body>
   <div class="app">
@@ -96,21 +96,11 @@
 
             <div class="center">
               <div class="center-top">
-                <div class="center-line">底池 <span id="m-pot">0</span></div>
-                <div class="center-line">阶段 <span id="m-street">-</span></div>
-                <div class="center-line">轮到 <span id="m-turn">-</span></div>
+                <div class="center-line">总注 <span id="m-pot">0</span></div>
               </div>
               <div id="m-community" class="cards" aria-label="community cards mobile"></div>
-              <div class="center-bottom">
-                当前下注 <span id="m-currentBet">0</span>
-              </div>
             </div>
           </div>
-        </div>
-
-        <div class="mobile-log">
-          <button id="btnToggleLog" class="btn btn-secondary">日志</button>
-          <div id="m-log" class="mobile-log-box" hidden></div>
         </div>
       </section>
 
@@ -133,6 +123,6 @@
     </footer>
   </div>
 
-  <script src="./app.js?v=20260323-mobile-ui-2"></script>
+  <script src="./app.js?v=20260323-table-clean"></script>
 </body>
 </html>

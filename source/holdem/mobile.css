@@ -34,11 +34,10 @@
   border: 1px solid rgba(255,255,255,.12);
 }
 
-.center-top{display:flex; justify-content:space-between; gap:10px; font-size:12px; color: var(--text); opacity:.92; flex-wrap:wrap;}
+.center-top{display:flex; justify-content:center; gap:10px; font-size:13px; color: var(--text); opacity:.95; flex-wrap:wrap; font-weight:900;}
 .center-line{white-space:nowrap}
 
 #m-community{justify-content:center; margin-top: 10px;}
-.center-bottom{margin-top: 8px; font-size:12px; color: var(--text); opacity:.9;}
 
 .m-seat{
   position:absolute;
@@ -96,16 +95,3 @@
 .m-raise-wrap{display:flex; gap:8px; flex:1; align-items:center;}
 .m-raise{width: 92px; padding: 12px 10px; border-radius: 12px; border:1px solid var(--border); background: rgba(0,0,0,.18); color: var(--text);}
 
-.mobile-log{margin-top:10px;}
-.mobile-log-box{
-  margin-top:10px;
-  padding: 10px;
-  border-radius: 14px;
-  border:1px solid var(--border);
-  background: rgba(0,0,0,.18);
-  max-height: 30vh;
-  overflow:auto;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 12px;
-  color: var(--text);
-}
