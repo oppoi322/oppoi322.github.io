@@ -71,318 +71,74 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-how-i-added-comments-with-utterances" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2026/03/22/how-i-added-comments-with-utterances/" class="article-date">
-  <time class="dt-published" datetime="2026-03-22T15:13:00.000Z" itemprop="datePublished">2026-03-22</time>
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2026" class="archive-year">2026</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      <a href="/2026/03/22/how-i-added-comments-with-utterances/" class="archive-article-date">
+  <time class="dt-published" datetime="2026-03-22T15:13:00.000Z" itemprop="datePublished">Mar 22</time>
 </a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
+      
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="/2026/03/22/how-i-added-comments-with-utterances/">给 Hexo + GitHub Pages 加评论：utterances（用 GitHub Issues 作为评论存储）</a>
+      <a class="archive-article-title" href="/2026/03/22/how-i-added-comments-with-utterances/">给 Hexo + GitHub Pages 加评论：utterances（用 GitHub Issues 作为评论存储）</a>
     </h1>
   
 
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>这个博客是跑在 GitHub Pages 上的静态站点：它只有 HTML&#x2F;CSS&#x2F;JS 文件，没有数据库、也没有后端服务进程。</p>
-<p>因此“评论”这种需要 <strong>写入&#x2F;保存</strong> 的功能，必须把数据存到别的地方（第三方服务、云函数、或某种可写存储）。我最终采用的是 <strong>utterances</strong>：</p>
-<ul>
-<li>评论 UI 在文章页下方（读者不需要跳去 GitHub 页面操作）</li>
-<li>评论数据存储在 GitHub 仓库的 <strong>Issues</strong> 里（每篇文章对应一个 Issue 线程）</li>
-<li>读者评论时需要 GitHub 登录（防垃圾、也更省事）</li>
-</ul>
-<p>本文记录接入过程，以及它背后大概用了哪些 GitHub 能力。</p>
-<h2 id="1-为什么静态站点“天然没有评论”"><a href="#1-为什么静态站点“天然没有评论”" class="headerlink" title="1. 为什么静态站点“天然没有评论”"></a>1. 为什么静态站点“天然没有评论”</h2><p>静态站点部署到 GitHub Pages 后：</p>
-<ul>
-<li>浏览器只能 <strong>GET</strong> 到页面文件</li>
-<li>没有一个可以 <strong>POST</strong> 新评论、写数据库的后端</li>
-</ul>
-<p>所以评论系统通常两种路线：</p>
-<ol>
-<li><strong>接第三方评论服务</strong>（它提供后端 + 存储）</li>
-<li><strong>自己搭一个后端</strong>（云函数 &#x2F; serverless 也行）</li>
-</ol>
-<p>utterances 属于一种很巧妙的“第三条路”：把 GitHub Issues 当成数据库。</p>
-<h2 id="2-utterances-的工作原理（概念版）"><a href="#2-utterances-的工作原理（概念版）" class="headerlink" title="2. utterances 的工作原理（概念版）"></a>2. utterances 的工作原理（概念版）</h2><p>当你打开某篇文章时，页面底部会加载一段脚本：</p>
-<ul>
-<li>它会根据文章的唯一标识（我们用的是 <code>pathname</code>）</li>
-<li>在指定仓库里找到对应的 Issue<ul>
-<li>找到了：就把 Issue 下面的评论渲染出来</li>
-<li>没找到：首次评论时会自动创建一个 Issue，然后再把评论写进去</li>
-</ul>
-</li>
-</ul>
-<p>你在页面里发的每条评论，本质上都会变成 GitHub 上该 Issue 的一条 <strong>comment</strong>。</p>
-<h3 id="“每篇文章一个-Issue”是怎么做到的？"><a href="#“每篇文章一个-Issue”是怎么做到的？" class="headerlink" title="“每篇文章一个 Issue”是怎么做到的？"></a>“每篇文章一个 Issue”是怎么做到的？</h3><p>utterances 支持多种映射策略（<code>issue_term</code>）：</p>
-<ul>
-<li><code>pathname</code>：用文章路径作为 key（当前站点使用）</li>
-<li><code>url</code>：用完整 URL</li>
-<li><code>title</code> &#x2F; <code>og:title</code>：用标题</li>
-</ul>
-<p>我们选择 <code>pathname</code> 的直觉原因是：</p>
-<ul>
-<li>同一篇文章的路径固定时，评论线程就固定</li>
-<li>不需要依赖标题（标题改了可能导致映射变化）</li>
-</ul>
-<h2 id="3-为什么要在-GitHub-上“Install-App”？"><a href="#3-为什么要在-GitHub-上“Install-App”？" class="headerlink" title="3. 为什么要在 GitHub 上“Install App”？"></a>3. 为什么要在 GitHub 上“Install App”？</h2><p>这不是下载到电脑上的那种 App，而是 <strong>GitHub App 授权</strong>。</p>
-<p>原因：</p>
-<ul>
-<li>评论要写入 Issues，属于“写操作”</li>
-<li>GitHub 必须确保这是一个被授权的应用在操作仓库资源</li>
-</ul>
-<p>安装时建议选择：</p>
-<ul>
-<li><strong>Only select repositories</strong> → 只授权 <code>oppoi322/oppoi322.github.io</code> 这一个仓库</li>
-</ul>
-<p>这样权限范围最小。</p>
-<h2 id="4-我在-Hexo-里做了哪些改动"><a href="#4-我在-Hexo-里做了哪些改动" class="headerlink" title="4. 我在 Hexo 里做了哪些改动"></a>4. 我在 Hexo 里做了哪些改动</h2><p>Hexo 的 <code>landscape</code> 主题原生只有 Disqus &#x2F; Valine 的插槽，没有 utterances。</p>
-<p>因此我做了三件事：</p>
-<h3 id="4-1-把主题放进仓库（便于自定义）"><a href="#4-1-把主题放进仓库（便于自定义）" class="headerlink" title="4.1 把主题放进仓库（便于自定义）"></a>4.1 把主题放进仓库（便于自定义）</h3><p>把 <code>themes/landscape/</code> 放进源码仓库，让 GitHub Actions 构建时也能拿到我们修改过的模板。</p>
-<h3 id="4-2-新增-utterances-的模板片段"><a href="#4-2-新增-utterances-的模板片段" class="headerlink" title="4.2 新增 utterances 的模板片段"></a>4.2 新增 utterances 的模板片段</h3><p>新增文件：</p>
-<ul>
-<li><code>themes/landscape/layout/_partial/comments/utterances.ejs</code></li>
-</ul>
-<p>里面就是 utterances 官方提供的嵌入脚本（略微参数化）：</p>
-<ul>
-<li><code>repo</code>：评论存储的仓库</li>
-<li><code>issue-term</code>：映射策略</li>
-<li><code>theme</code>：评论区主题</li>
-</ul>
-<h3 id="4-3-在文章页模板里插入评论区"><a href="#4-3-在文章页模板里插入评论区" class="headerlink" title="4.3 在文章页模板里插入评论区"></a>4.3 在文章页模板里插入评论区</h3><p>在文章页模板（<code>themes/landscape/layout/_partial/article.ejs</code>）末尾加入：</p>
-<ul>
-<li>仅在“文章详情页”显示（不是首页列表）</li>
-<li>仅在该文章允许评论时显示</li>
-</ul>
-<p>这样评论区会出现在正文后面。</p>
-<h3 id="4-4-在主题配置里加-utterances-配置"><a href="#4-4-在主题配置里加-utterances-配置" class="headerlink" title="4.4 在主题配置里加 utterances 配置"></a>4.4 在主题配置里加 utterances 配置</h3><p>在 <code>themes/landscape/_config.yml</code> 里加了：</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">utterances:</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">oppoi322/oppoi322.github.io</span></span><br><span class="line">  <span class="attr">issue_term:</span> <span class="string">pathname</span></span><br><span class="line">  <span class="attr">theme:</span> <span class="string">github-light</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="5-这套方案用到了哪些-GitHub-能力（API-视角）"><a href="#5-这套方案用到了哪些-GitHub-能力（API-视角）" class="headerlink" title="5. 这套方案用到了哪些 GitHub 能力（API 视角）"></a>5. 这套方案用到了哪些 GitHub 能力（API 视角）</h2><p>从效果上看，utterances 主要依赖的是：</p>
-<ul>
-<li><strong>GitHub Issues</strong>：作为“每篇文章一个线程”的存储</li>
-<li><strong>Issue Comments</strong>：评论本体</li>
-<li><strong>GitHub App 授权</strong>：让脚本能安全地读写 Issues</li>
-</ul>
-<p>具体到 API 层面（不用你自己写 API 调用，utterances 都封装好了），大致会涉及：</p>
-<ul>
-<li>查询&#x2F;创建 Issue</li>
-<li>查询&#x2F;创建 Issue Comment</li>
-</ul>
-<p>你在页面里看到的“回复某条评论”，其实就是在对应 Issue 里继续回复（同一个线程下的评论流）。</p>
-<h2 id="6-优缺点"><a href="#6-优缺点" class="headerlink" title="6. 优缺点"></a>6. 优缺点</h2><p>优点：</p>
-<ul>
-<li>不用自建服务器&#x2F;数据库</li>
-<li>评论天然带账号体系（减少垃圾评论）</li>
-<li>评论数据在你自己的 GitHub 仓库里，可导出、可管理</li>
-</ul>
-<p>缺点：</p>
-<ul>
-<li>评论者需要 GitHub 登录（不是完全匿名）</li>
-<li>仓库里会多出一些 Issues（这就是评论存储的代价）</li>
-</ul>
-<hr>
-<p>如果你也想给自己的 <code>xxx.github.io</code> 加评论：utterances 是“最轻量、最不需要运维”的路线之一。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2026/03/22/how-i-added-comments-with-utterances/" data-id="cuidjhEv1wCeK_MjHvNtDe5xf" data-title="给 Hexo + GitHub Pages 加评论：utterances（用 GitHub Issues 作为评论存储）" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/utterances/" rel="tag">utterances</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" rel="tag">评论系统</a></li></ul>
-
-    </footer>
+    </header>
   </div>
-  
 </article>
-
-
-
-
-
   
-    <article id="post-how-i-deployed-this-hexo-blog" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2026/03/22/how-i-deployed-this-hexo-blog/" class="article-date">
-  <time class="dt-published" datetime="2026-03-22T14:20:00.000Z" itemprop="datePublished">2026-03-22</time>
+    
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      <a href="/2026/03/22/how-i-deployed-this-hexo-blog/" class="archive-article-date">
+  <time class="dt-published" datetime="2026-03-22T14:20:00.000Z" itemprop="datePublished">Mar 22</time>
 </a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
+      
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="/2026/03/22/how-i-deployed-this-hexo-blog/">我是如何把这个 Hexo 博客部署到 GitHub Pages（oppoi322.github.io）</a>
+      <a class="archive-article-title" href="/2026/03/22/how-i-deployed-this-hexo-blog/">我是如何把这个 Hexo 博客部署到 GitHub Pages（oppoi322.github.io）</a>
     </h1>
   
 
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>这篇文章记录一下这个站点（<code>oppoi322.github.io</code>）从 0 到上线的全过程：本地生成 Hexo、把源码推到 GitHub、用 GitHub Actions 自动构建、最后由 GitHub Pages 对外提供访问。</p>
-<blockquote>
-<p>说明：本文更像是一份“可复现的流水账”。如果你照着做，基本可以把自己的 <code>xxx.github.io</code> 也搭起来。</p>
-</blockquote>
-<h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><ul>
-<li>用 Hexo 生成静态博客</li>
-<li>源码放在仓库 <code>oppoi322/oppoi322.github.io</code> 的 <code>main</code> 分支</li>
-<li>由 GitHub Actions 自动构建（生成 <code>public/</code>）</li>
-<li>构建产物发布到 <code>gh-pages</code> 分支</li>
-<li>GitHub Pages 从 <code>gh-pages</code> 分支根目录提供站点：<a target="_blank" rel="noopener" href="https://oppoi322.github.io/">https://oppoi322.github.io/</a></li>
-</ul>
-<h2 id="1-本地初始化-Hexo"><a href="#1-本地初始化-Hexo" class="headerlink" title="1. 本地初始化 Hexo"></a>1. 本地初始化 Hexo</h2><p>环境：Node.js + npm（或 pnpm）。</p>
-<p>初始化一个 Hexo 站点：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">npm i -g hexo-cli</span><br><span class="line">hexo init blog</span><br><span class="line"><span class="built_in">cd</span> blog</span><br><span class="line">npm i</span><br></pre></td></tr></table></figure>
-
-<p>本地预览：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx hexo server</span><br></pre></td></tr></table></figure>
-
-<p>生成静态文件（产物在 <code>public/</code>）：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npx hexo clean</span><br><span class="line">npx hexo generate</span><br></pre></td></tr></table></figure>
-
-<h2 id="2-创建-GitHub-Pages-仓库"><a href="#2-创建-GitHub-Pages-仓库" class="headerlink" title="2. 创建 GitHub Pages 仓库"></a>2. 创建 GitHub Pages 仓库</h2><p>GitHub Pages 的默认规则是：</p>
-<ul>
-<li>个人主页仓库名必须是：<code>&lt;用户名&gt;.github.io</code></li>
-</ul>
-<p>所以这里仓库名是：</p>
-<ul>
-<li><code>oppoi322.github.io</code></li>
-</ul>
-<p>仓库设为 Public。</p>
-<h2 id="3-把-Hexo-源码推到-main-分支"><a href="#3-把-Hexo-源码推到-main-分支" class="headerlink" title="3. 把 Hexo 源码推到 main 分支"></a>3. 把 Hexo 源码推到 main 分支</h2><p>在 Hexo 项目根目录初始化 git，并推到 GitHub：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git init -b main</span><br><span class="line">git add -A</span><br><span class="line">git commit -m <span class="string">&quot;init hexo&quot;</span></span><br><span class="line"></span><br><span class="line">git remote add origin https://github.com/oppoi322/oppoi322.github.io.git</span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
-
-<p>同时建议加 <code>.gitignore</code>，不要把 <code>node_modules/</code>、<code>public/</code> 之类提交进去：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">node_modules/</span><br><span class="line">public/</span><br><span class="line">.deploy_git/</span><br><span class="line">.DS_Store</span><br><span class="line">Thumbs.db</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>这里选择“提交源码而不是提交 public”，因为我们希望由 Actions 来负责构建。</p>
-</blockquote>
-<h2 id="4-配置-GitHub-Actions：构建并发布到-gh-pages"><a href="#4-配置-GitHub-Actions：构建并发布到-gh-pages" class="headerlink" title="4. 配置 GitHub Actions：构建并发布到 gh-pages"></a>4. 配置 GitHub Actions：构建并发布到 gh-pages</h2><p>在仓库里创建工作流文件：<code>.github/workflows/pages.yml</code>。</p>
-<p>核心逻辑：</p>
-<ol>
-<li>checkout 代码</li>
-<li>安装依赖</li>
-<li><code>hexo generate</code> 生成 <code>public/</code></li>
-<li>使用 <code>peaceiris/actions-gh-pages</code> 把 <code>public/</code> 推到 <code>gh-pages</code> 分支</li>
-</ol>
-<p>本次部署中用的是 <strong>pnpm</strong>（因为项目里有 <code>pnpm-lock.yaml</code>），工作流大致如下：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">Hexo</span> <span class="string">to</span> <span class="string">GitHub</span> <span class="string">Pages</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">main</span></span><br><span class="line">  <span class="attr">workflow_dispatch:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">permissions:</span></span><br><span class="line">  <span class="attr">contents:</span> <span class="string">write</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/checkout@v4</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">pnpm</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">pnpm/action-setup@v4</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">version:</span> <span class="number">9</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">Node</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/setup-node@v4</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">node-version:</span> <span class="number">20</span></span><br><span class="line">          <span class="attr">cache:</span> <span class="string">&#x27;pnpm&#x27;</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">dependencies</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">pnpm</span> <span class="string">install</span> <span class="string">--frozen-lockfile</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Build</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          pnpm exec hexo clean</span></span><br><span class="line"><span class="string">          pnpm exec hexo generate</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Deploy</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">peaceiris/actions-gh-pages@v4</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">github_token:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.GITHUB_TOKEN</span> <span class="string">&#125;&#125;</span></span><br><span class="line">          <span class="attr">publish_dir:</span> <span class="string">./public</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="踩过的坑"><a href="#踩过的坑" class="headerlink" title="踩过的坑"></a>踩过的坑</h3><ul>
-<li>一开始用 <code>npm ci</code>，但仓库里没有 <code>package-lock.json</code>（只有 <code>pnpm-lock.yaml</code>），所以 CI 直接报错。</li>
-<li>后来切到 pnpm，但需要注意顺序：要先安装 pnpm，再让 <code>setup-node</code> 进行 pnpm 缓存配置，否则会出现 “找不到 pnpm 可执行文件”。</li>
-</ul>
-<h2 id="5-配置-GitHub-Pages-的-Source"><a href="#5-配置-GitHub-Pages-的-Source" class="headerlink" title="5. 配置 GitHub Pages 的 Source"></a>5. 配置 GitHub Pages 的 Source</h2><p>进入仓库 Settings → Pages：</p>
-<ul>
-<li>Source 选择 <code>gh-pages</code> 分支</li>
-<li>目录选择 <code>/(root)</code></li>
-</ul>
-<p>保存后等待构建完成。</p>
-<p>如果出现短暂 404&#x2F;errored，通常是 Pages 构建队列或缓存，需要等一会儿；必要时可以重新触发一次 Pages build。</p>
-<h2 id="6-以后如何写文章并发布"><a href="#6-以后如何写文章并发布" class="headerlink" title="6. 以后如何写文章并发布"></a>6. 以后如何写文章并发布</h2><p>写一篇新文章：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx hexo new <span class="string">&quot;My Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>编辑 <code>source/_posts/*.md</code>，然后提交并推到 <code>main</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add -A</span><br><span class="line">git commit -m <span class="string">&quot;add post&quot;</span></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
-
-<p>推送到 <code>main</code> 后，Actions 会自动构建并把生成的静态文件发布到 <code>gh-pages</code>，页面随后更新。</p>
-<hr>
-<p>如果你也想做一个自己的 <code>xxx.github.io</code>：最关键的就三件事——仓库名规则、Actions 自动发布、Pages 指向 <code>gh-pages</code> 分支。其余都是“锦上添花”的主题和内容。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2026/03/22/how-i-deployed-this-hexo-blog/" data-id="cuidJwq4q5dlI76Saaxa6pw9c" data-title="我是如何把这个 Hexo 博客部署到 GitHub Pages（oppoi322.github.io）" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GitHub-Actions/" rel="tag">GitHub Actions</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E9%83%A8%E7%BD%B2/" rel="tag">部署</a></li></ul>
-
-    </footer>
+    </header>
   </div>
-  
 </article>
-
-
-
-
-
   
-    <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2026/03/22/hello-world/" class="article-date">
-  <time class="dt-published" datetime="2026-03-22T07:14:09.667Z" itemprop="datePublished">2026-03-22</time>
+    
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      <a href="/2026/03/22/hello-world/" class="archive-article-date">
+  <time class="dt-published" datetime="2026-03-22T07:19:02.765Z" itemprop="datePublished">Mar 22</time>
 </a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
+      
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="/2026/03/22/hello-world/">Hello World</a>
+      <a class="archive-article-title" href="/2026/03/22/hello-world/">Hello World</a>
     </h1>
   
 
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2026/03/22/hello-world/" data-id="cuidr1lUiRHTAHEgHB2BByZ-l" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-    </footer>
+    </header>
   </div>
-  
 </article>
-
-
-
-
-
+  
+  
+    </div></section>
   
 
 
