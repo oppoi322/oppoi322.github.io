@@ -4,6 +4,7 @@
 # Navigation menu
 menu:
   Home: /
+  About: /about
   Archives: /archives
 # RSS link
 rss: /atom.xml
