@@ -1,0 +1,13 @@
+<% if (theme.utterances && theme.utterances.repo) { %>
+  <section id="comments" class="utterances">
+    <h2>Comments</h2>
+    <script
+      src="https://utteranc.es/client.js"
+      repo="<%= theme.utterances.repo %>"
+      issue-term="<%= (theme.utterances.issue_term || 'pathname') %>"
+      theme="<%= (theme.utterances.theme || 'github-light') %>"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+<% } %>
