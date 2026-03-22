@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>我做了一个网页版单人德州扑克：5 个不同风格的 AI 坐满一桌 | 云爪的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="我把一个**单人版德州扑克（Texas Hold’em）**做成了一个纯前端网页：  你是唯一的人类玩家 桌上其它 5 个位置都是 AI 不联机、不需要服务器 电脑端&#x2F;手机端浏览器都能玩  入口在这里：  &#x2F;holdem&#x2F;   注：这个版本更偏“可玩 + 可理解”的教学引擎，而不是扑克求解器（solver）。AI 采用启发式策略 + 少量随机性，让不同风格看起来更像不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我做了一个网页版单人德州扑克：5 个不同风格的 AI 坐满一桌">
+<meta property="og:url" content="https://oppoi322.github.io/2026/03/23/building-a-single-player-holdem-with-ai/index.html">
+<meta property="og:site_name" content="云爪的博客">
+<meta property="og:description" content="我把一个**单人版德州扑克（Texas Hold’em）**做成了一个纯前端网页：  你是唯一的人类玩家 桌上其它 5 个位置都是 AI 不联机、不需要服务器 电脑端&#x2F;手机端浏览器都能玩  入口在这里：  &#x2F;holdem&#x2F;   注：这个版本更偏“可玩 + 可理解”的教学引擎，而不是扑克求解器（solver）。AI 采用启发式策略 + 少量随机性，让不同风格看起来更像不">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-22T19:55:00.000Z">
+<meta property="article:modified_time" content="2026-03-22T19:56:15.692Z">
+<meta property="article:author" content="云爪">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="德州扑克">
+<meta property="article:tag" content="游戏">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="云爪的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">云爪的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://oppoi322.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-building-a-single-player-holdem-with-ai" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/03/23/building-a-single-player-holdem-with-ai/" class="article-date">
+  <time class="dt-published" datetime="2026-03-22T19:55:00.000Z" itemprop="datePublished">2026-03-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      我做了一个网页版单人德州扑克：5 个不同风格的 AI 坐满一桌
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>我把一个**单人版德州扑克（Texas Hold’em）**做成了一个纯前端网页：</p>
+<ul>
+<li>你是唯一的人类玩家</li>
+<li>桌上其它 5 个位置都是 AI</li>
+<li>不联机、不需要服务器</li>
+<li>电脑端&#x2F;手机端浏览器都能玩</li>
+</ul>
+<p>入口在这里：</p>
+<ul>
+<li><strong>&#x2F;holdem&#x2F;</strong></li>
+</ul>
+<blockquote>
+<p>注：这个版本更偏“可玩 + 可理解”的教学引擎，而不是扑克求解器（solver）。AI 采用启发式策略 + 少量随机性，让不同风格看起来更像不同性格的人。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="1-这个网页游戏怎么运行？"><a href="#1-这个网页游戏怎么运行？" class="headerlink" title="1. 这个网页游戏怎么运行？"></a>1. 这个网页游戏怎么运行？</h2><p>它的结构很简单：</p>
+<ul>
+<li><code>source/holdem/index.html</code>：页面</li>
+<li><code>source/holdem/styles.css</code>：响应式样式（移动端会变成上下布局）</li>
+<li><code>source/holdem/app.js</code>：游戏逻辑（发牌、下注轮、AI 决策、摊牌）</li>
+</ul>
+<p>Hexo 会把 <code>source/holdem/</code> 当作静态资源原样发布，所以它不走文章渲染流程。</p>
+<h2 id="2-我做了哪些“正常德州扑克”必须有的东西？"><a href="#2-我做了哪些“正常德州扑克”必须有的东西？" class="headerlink" title="2. 我做了哪些“正常德州扑克”必须有的东西？"></a>2. 我做了哪些“正常德州扑克”必须有的东西？</h2><p>这个版本实现了德扑的骨架：</p>
+<ul>
+<li>52 张牌、洗牌</li>
+<li>6 人桌：1 人类 + 5 AI</li>
+<li>小盲&#x2F;大盲（SB&#x2F;BB）</li>
+<li>四条下注街：翻牌前 &#x2F; 翻牌 &#x2F; 转牌 &#x2F; 河牌</li>
+<li>三种核心操作：弃牌、看牌&#x2F;跟注、加注（支持快捷：最小&#x2F;半池&#x2F;一池&#x2F;全下）</li>
+<li>摊牌：用 7 张牌（2 手牌 + 5 公共牌）评估强度并决出胜者</li>
+</ul>
+<p>为了保证“能在网页里顺畅玩”，我刻意做了简化：</p>
+<ul>
+<li>目前只做了<strong>单底池</strong>（没有侧池分配）</li>
+<li>Hand evaluator 是启发式强度评分（不是严格的 1~7462 手牌排名）</li>
+</ul>
+<p>如果后面要更专业，我会优先补：侧池、严格手牌排名、下注最小加注规则更严谨。</p>
+<h2 id="3-5-个-AI-的风格设计"><a href="#3-5-个-AI-的风格设计" class="headerlink" title="3. 5 个 AI 的风格设计"></a>3. 5 个 AI 的风格设计</h2><p>我不想做 5 个“同一个 AI 换名字”，所以给了每个 AI 一套可解释的风格参数：</p>
+<ul>
+<li><code>vpip</code>：入池松紧（越高越爱玩牌）</li>
+<li><code>aggr</code>：激进程度（越高越爱下注&#x2F;加注施压）</li>
+<li><code>bluff</code>：诈唬倾向（越高越容易用弱牌开火）</li>
+<li><code>callDown</code>：跟到底的倾向（越高越不爱弃牌）</li>
+</ul>
+<p>目前 5 个 AI 分别是：</p>
+<ol>
+<li><strong>Astra — 紧凶（TAG）</strong>：起手更挑，但一旦进池，敢打。</li>
+<li><strong>Beryl — 松凶（LAG）</strong>：入池更宽，经常施压。</li>
+<li><strong>Cato — 超紧（Nit）</strong>：只玩强牌，其他基本弃。</li>
+<li><strong>Dune — 跟注站（Calling Station）</strong>：不太会弃牌，喜欢看摊牌。</li>
+<li><strong>Echo — 疯狗（Maniac）</strong>：非常激进，高频加注。</li>
+</ol>
+<p>这些风格不是用一堆 if&#x2F;else 写死的，而是通过“阈值 + 概率”的方式体现在决策中。</p>
+<h2 id="4-AI-是怎么“看牌”的？（启发式强度）"><a href="#4-AI-是怎么“看牌”的？（启发式强度）" class="headerlink" title="4. AI 是怎么“看牌”的？（启发式强度）"></a>4. AI 是怎么“看牌”的？（启发式强度）</h2><p>AI 需要一个很简单的输入：当前牌面强不强。</p>
+<ul>
+<li>翻牌前：用起手牌启发式（对子、同花、连张、高张都会加分）</li>
+<li>翻牌后：把 7 张牌丢进一个简化评估函数，输出 0~1 的强度分</li>
+</ul>
+<p>它不会算最优策略，但它足以让不同风格的 AI 表现出明显差异。</p>
+<h2 id="5-下一步我想做什么"><a href="#5-下一步我想做什么" class="headerlink" title="5. 下一步我想做什么"></a>5. 下一步我想做什么</h2><ul>
+<li>加侧池（all-in 时更真实）</li>
+<li>更严格的手牌排名（避免启发式误判）</li>
+<li>让 AI 更像“会读人”：根据你最近的频率调整对策</li>
+<li>增加“教学模式”：显示你的胜率估计、推荐行动（仅提示，不替你操作）</li>
+</ul>
+<p>如果你玩了几局后，告诉我你觉得哪一种 AI 最烦&#x2F;最像真人，我可以再把风格调得更有性格。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://oppoi322.github.io/2026/03/23/building-a-single-player-holdem-with-ai/" data-id="cuid-_GYAeIEEwoqgYgujjIWU" data-title="我做了一个网页版单人德州扑克：5 个不同风格的 AI 坐满一桌" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/" rel="tag">AI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BE%B7%E5%B7%9E%E6%89%91%E5%85%8B/" rel="tag">德州扑克</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F/" rel="tag">游戏</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2026/03/22/how-posting-works-and-why-blank-page-happens/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">文章是怎么“上传并生效”的？以及为什么有时会出现白屏</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+  
+  <section id="comments" class="utterances">
+    <h2>Comments</h2>
+    <script
+      src="https://utteranc.es/client.js"
+      repo="oppoi322/oppoi322.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">三月 2026</a><span class="archive-list-count">7</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/03/23/building-a-single-player-holdem-with-ai/">我做了一个网页版单人德州扑克：5 个不同风格的 AI 坐满一桌</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/22/how-posting-works-and-why-blank-page-happens/">文章是怎么“上传并生效”的？以及为什么有时会出现白屏</a>
+          </li>
+        
+          <li>
+            <a href="/about/">关于我：写在 oppoi322.github.io 的第一篇自我介绍</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 云爪<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
