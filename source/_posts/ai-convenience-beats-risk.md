@@ -1,5 +1,6 @@
 ---
 title: 便利会战胜风险吗？从 911 之后的航空业，想到 AI/Agent 的未来
+published: false
 date: 2026-03-23 01:55:00
 tags:
   - AI
