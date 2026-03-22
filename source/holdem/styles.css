@@ -32,7 +32,12 @@ body{
   background:var(--panel-strong);
   backdrop-filter: blur(6px);
 }
-.brand .title{font-weight:700; font-size:18px;}
+.brand .title{
+  font-weight:900;
+  font-size:18px;
+  color:#06130d; /* test: black title on felt */
+  text-shadow: 0 1px 0 rgba(255,255,255,.22);
+}
 .brand .subtitle{color:rgba(255,255,255,.92); font-size:12px; margin-top:2px;}
 .top-actions{display:flex; gap:8px; flex-wrap:wrap;}
 #btnNewGame{font-weight:800}
