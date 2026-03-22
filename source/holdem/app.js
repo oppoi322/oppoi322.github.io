@@ -400,13 +400,9 @@
 
         const row2=document.createElement('div');
         row2.className='row2';
-        // show bet or folded/all-in state
+        // show bet or folded/all-in state + balance
         const betOrState = stateMark || `下注 ${fmt(s.bet)}`;
-        row2.innerHTML = `<span>${escapeHtml(styleName)}</span><span>${betOrState}</span>`;
-
-        const row2b=document.createElement('div');
-        row2b.className='row2';
-        row2b.innerHTML = `<span>余额 ${fmt(s.stack)}</span><span></span>`;
+        row2.innerHTML = `<span>${betOrState}</span><span>余额 ${fmt(s.stack)}</span>`;
 
         const row3=document.createElement('div');
         row3.className='row3';
