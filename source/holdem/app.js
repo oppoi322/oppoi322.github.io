@@ -484,18 +484,23 @@
     if(GAME.actionLock) return;
     GAME.actionLock=true;
 
-    while(!GAME.handOver && !GAME.seats[GAME.toAct].isHuman){
-      await sleep(350 + Math.random()*350);
-      await aiAct(GAME.toAct);
-      if(GAME.handOver) break;
-      if(allBetsMatched() && allActedThisRound()){
-        advanceStreet();
+    try{
+      while(!GAME.handOver && !GAME.seats[GAME.toAct].isHuman){
+        await sleep(350 + Math.random()*350);
+        await aiAct(GAME.toAct);
+        if(GAME.handOver) break;
+        if(allBetsMatched() && allActedThisRound()){
+          advanceStreet();
+        }
+        render();
       }
+    }catch(e){
+      console.error('[holdem] runUntilHuman error', e);
+      log('（出现错误：已自动解锁操作。你可以继续，或点“重置筹码”重新开始。）');
+    }finally{
+      GAME.actionLock=false;
       render();
     }
-
-    GAME.actionLock=false;
-    render();
   }
 
   function allActedThisRound(){
@@ -724,6 +729,7 @@
 
   // ---------- Human actions
   function humanFold(){
+    if(GAME.actionLock) return;
     const idx = GAME.toAct;
     const s=GAME.seats[idx];
     s.folded=true;
@@ -739,6 +745,7 @@
   }
 
   function humanCheckCall(){
+    if(GAME.actionLock) return;
     const idx=GAME.toAct;
     const s=GAME.seats[idx];
     const facing = GAME.currentBet - s.bet;
@@ -759,6 +766,7 @@
   }
 
   function humanRaise(amount){
+    if(GAME.actionLock) return;
     const idx=GAME.toAct;
     const s=GAME.seats[idx];
     const facing = GAME.currentBet - s.bet;
