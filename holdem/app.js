@@ -290,6 +290,7 @@
   }
 
   function render(){
+    // ----- Desktop UI (existing)
     $('street').textContent = streetName(GAME.street);
     $('pot').textContent = fmt(GAME.pot);
     $('currentBet').textContent = fmt(GAME.currentBet);
@@ -332,7 +333,6 @@
         cards.appendChild(renderCard({r:'',s:'♠'},true,true));
         cards.appendChild(renderCard({r:'',s:'♠'},true,true));
       }else{
-        // show face down unless hand over
         const show = GAME.handOver;
         cards.appendChild(renderCard(s.hole[0], true, !show));
         cards.appendChild(renderCard(s.hole[1], true, !show));
@@ -354,7 +354,7 @@
     }
     $('yourStack').textContent = fmt(you?.stack||0);
 
-    // controls
+    // controls (desktop)
     const isYourTurn = (GAME.seats[GAME.toAct]?.isHuman && !GAME.handOver);
     $('btnFold').disabled = !isYourTurn || GAME.actionLock;
     $('btnCheckCall').disabled = !isYourTurn || GAME.actionLock;
@@ -362,6 +362,79 @@
     $('raiseAmount').disabled = !isYourTurn || GAME.actionLock;
     for(const b of document.querySelectorAll('.chip')){
       b.disabled = !isYourTurn || GAME.actionLock;
+    }
+
+    // ----- Mobile UI (oval table)
+    // If elements exist (mobile-only), update them too.
+    if(document.getElementById('m-community')){
+      $('m-street').textContent = streetName(GAME.street);
+      $('m-pot').textContent = fmt(GAME.pot);
+      $('m-currentBet').textContent = fmt(GAME.currentBet);
+      $('m-turn').textContent = GAME.seats[GAME.toAct]?.name || '-';
+
+      const mcc = $('m-community');
+      mcc.innerHTML='';
+      for(const c of GAME.community){
+        mcc.appendChild(renderCard(c,false,false));
+      }
+
+      // map seats to positions: 0 hero bottom, 3 top, 1 left-bottom, 2 left-top, 4 right-top, 5 right-bottom
+      const map = [0, 2, 3, 4, 5, 1];
+      for(let pos=0; pos<6; pos++){
+        const seatIdx = map[pos];
+        const box = document.getElementById('m-seat-'+pos);
+        if(!box) continue;
+        const s = GAME.seats[seatIdx];
+        if(!s){ box.innerHTML=''; continue; }
+
+        const turnMark = (seatIdx===GAME.toAct && !GAME.handOver) ? ' · 回合' : '';
+        const stateMark = s.allIn ? '全下' : (s.folded ? '弃牌' : '');
+        const styleName = s.isHuman ? '玩家' : s.profile.style.name;
+
+        const show = GAME.handOver;
+        const c1 = s.isHuman || show ? renderCard(s.hole[0], true, false) : renderCard(s.hole[0], true, true);
+        const c2 = s.isHuman || show ? renderCard(s.hole[1], true, false) : renderCard(s.hole[1], true, true);
+
+        box.innerHTML='';
+        const row1=document.createElement('div');
+        row1.className='row1';
+        row1.textContent = `${s.name}${s.isHuman?'（你）':''}${turnMark}`;
+
+        const row2=document.createElement('div');
+        row2.className='row2';
+        row2.innerHTML = `<span>${escapeHtml(styleName)}</span><span>${stateMark}</span>`;
+
+        const row2b=document.createElement('div');
+        row2b.className='row2';
+        row2b.innerHTML = `<span>筹码 ${fmt(s.stack)}</span><span>下注 ${fmt(s.bet)}</span>`;
+
+        const row3=document.createElement('div');
+        row3.className='row3';
+        row3.appendChild(c1);
+        row3.appendChild(c2);
+
+        box.appendChild(row1);
+        box.appendChild(row2);
+        box.appendChild(row2b);
+        box.appendChild(row3);
+      }
+
+      // mobile actionbar state
+      $('m-btnFold').disabled = !isYourTurn || GAME.actionLock;
+      $('m-btnCheckCall').disabled = !isYourTurn || GAME.actionLock;
+      $('m-btnRaise').disabled = !isYourTurn || GAME.actionLock;
+      $('m-raiseAmount').disabled = !isYourTurn || GAME.actionLock;
+
+      // mirror raiseAmount
+      const v = Number($('raiseAmount').value||0);
+      if(!Number.isNaN(v)) $('m-raiseAmount').value = String(v);
+
+      // mobile log last lines
+      const mlog = $('m-log');
+      if(mlog){
+        const lines = Array.from($('log').children).slice(-10).map(x=>x.textContent||'');
+        mlog.textContent = lines.join('\n');
+      }
     }
   }
 
@@ -803,12 +876,40 @@
   function setupUI(){
     $('btnNewGame').addEventListener('click', ()=>newGame());
 
+    // desktop actions
     $('btnFold').addEventListener('click', ()=>humanFold());
     $('btnCheckCall').addEventListener('click', ()=>humanCheckCall());
     $('btnRaise').addEventListener('click', ()=>{
       const v = Number($('raiseAmount').value||0);
       humanRaise(v);
     });
+
+    // mobile actions
+    const mFold = document.getElementById('m-btnFold');
+    const mCC = document.getElementById('m-btnCheckCall');
+    const mRaise = document.getElementById('m-btnRaise');
+    const mAmt = document.getElementById('m-raiseAmount');
+    if(mFold && mCC && mRaise && mAmt){
+      mFold.addEventListener('click', ()=>humanFold());
+      mCC.addEventListener('click', ()=>humanCheckCall());
+      mRaise.addEventListener('click', ()=>{
+        const v = Number((mAmt).value||0);
+        // keep desktop field in sync for convenience
+        $('raiseAmount').value = String(v);
+        humanRaise(v);
+      });
+      mAmt.addEventListener('change', ()=>{
+        $('raiseAmount').value = String((mAmt).value||0);
+      });
+
+      const t = document.getElementById('btnToggleLog');
+      if(t){
+        t.addEventListener('click', ()=>{
+          const box = $('m-log');
+          box.hidden = !box.hidden;
+        });
+      }
+    }
 
     document.querySelectorAll('.chip').forEach(btn=>{
       btn.addEventListener('click', ()=>{
@@ -824,7 +925,10 @@
         }else if(key==='allin'){
           target = you.bet + you.stack;
         }
-        $('raiseAmount').value = Math.max(GAME.bb, Math.round(target/10)*10);
+        const val = Math.max(GAME.bb, Math.round(target/10)*10);
+        $('raiseAmount').value = val;
+        const mAmt2 = document.getElementById('m-raiseAmount');
+        if(mAmt2) mAmt2.value = val;
       });
     });
   }

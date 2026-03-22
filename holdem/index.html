@@ -6,15 +6,15 @@
   
   <title>云爪的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="德州扑克（单人版）- 云爪的博客                                德州扑克（单人版）         你 vs 多个 AI（不同风格）。纯前端。本页不需要登录。                       重置筹码">
+  <meta name="description" content="德州扑克（单人版）- 云爪的博客                                   德州扑克（单人版）         你 vs 多个 AI（不同风格）。纯前端。本页不需要登录。                       重置筹码">
 <meta property="og:type" content="website">
 <meta property="og:title" content="云爪的博客">
 <meta property="og:url" content="https://oppoi322.github.io/holdem/index.html">
 <meta property="og:site_name" content="云爪的博客">
-<meta property="og:description" content="德州扑克（单人版）- 云爪的博客                                德州扑克（单人版）         你 vs 多个 AI（不同风格）。纯前端。本页不需要登录。                       重置筹码">
+<meta property="og:description" content="德州扑克（单人版）- 云爪的博客                                   德州扑克（单人版）         你 vs 多个 AI（不同风格）。纯前端。本页不需要登录。                       重置筹码">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-03-22T21:55:47.952Z">
-<meta property="article:modified_time" content="2026-03-22T21:55:47.952Z">
+<meta property="article:published_time" content="2026-03-22T22:03:35.423Z">
+<meta property="article:modified_time" content="2026-03-22T22:03:35.423Z">
 <meta property="article:author" content="云爪">
 <meta name="twitter:card" content="summary">
   
@@ -80,7 +80,7 @@
         <section id="main"><article id="page-" class="h-entry article article-type-page" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/holdem/index.html" class="article-date">
-  <time class="dt-published" datetime="2026-03-22T21:55:47.952Z" itemprop="datePublished">2026-03-23</time>
+  <time class="dt-published" datetime="2026-03-22T22:03:35.423Z" itemprop="datePublished">2026-03-23</time>
 </a>
     
   </div>
@@ -97,6 +97,7 @@
   <title>德州扑克（单人版）- 云爪的博客</title>
   <meta name="description" content="单人德州扑克：你对战多名不同风格的AI玩家（纯前端，无联机）。" />
   <link rel="stylesheet" href="./styles.css?v=20260323-green-panels-2" />
+  <link rel="stylesheet" href="./mobile.css?v=20260323-mobile-ui" />
 </head>
 <body>
   <div class="app">
@@ -111,7 +112,8 @@
     </header>
 
     <main class="layout">
-      <section class="table" aria-label="poker table">
+      <!-- Desktop layout (existing) -->
+      <section class="table desktop-only" aria-label="poker table">
         <div class="table-inner">
           <div class="board">
             <div class="row">
@@ -130,7 +132,7 @@
         </div>
       </section>
 
-      <aside class="panel">
+      <aside class="panel desktop-only">
         <section class="you">
           <h2>你的手牌</h2>
           <div id="yourCards" class="cards"></div>
@@ -171,6 +173,46 @@
           <div id="log" class="log-box" role="log" aria-live="polite"></div>
         </section>
       </aside>
+
+      <!-- Mobile layout: oval table + bottom action bar -->
+      <section class="mobile-table mobile-only" aria-label="mobile poker table">
+        <div class="oval">
+          <div class="oval-inner">
+            <div id="m-seat-0" class="m-seat"></div>
+            <div id="m-seat-1" class="m-seat"></div>
+            <div id="m-seat-2" class="m-seat"></div>
+            <div id="m-seat-3" class="m-seat"></div>
+            <div id="m-seat-4" class="m-seat"></div>
+            <div id="m-seat-5" class="m-seat"></div>
+
+            <div class="center">
+              <div class="center-top">
+                <div class="center-line">底池 <span id="m-pot">0</span></div>
+                <div class="center-line">阶段 <span id="m-street">-</span></div>
+                <div class="center-line">轮到 <span id="m-turn">-</span></div>
+              </div>
+              <div id="m-community" class="cards" aria-label="community cards mobile"></div>
+              <div class="center-bottom">
+                当前下注 <span id="m-currentBet">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mobile-log">
+          <button id="btnToggleLog" class="btn btn-secondary">日志</button>
+          <div id="m-log" class="mobile-log-box" hidden></div>
+        </div>
+      </section>
+
+      <nav class="actionbar mobile-only" aria-label="actions">
+        <button id="m-btnFold" class="btn btn-danger">弃牌</button>
+        <button id="m-btnCheckCall" class="btn">看牌/跟注</button>
+        <div class="m-raise-wrap">
+          <button id="m-btnRaise" class="btn btn-primary">加注</button>
+          <input id="m-raiseAmount" class="m-raise" type="number" inputmode="numeric" min="0" step="10" placeholder="金额" />
+        </div>
+      </nav>
     </main>
 
     <footer class="footer">
@@ -182,14 +224,14 @@
     </footer>
   </div>
 
-  <script src="./app.js?v=20260323-freeze-fix"></script>
+  <script src="./app.js?v=20260323-mobile-ui"></script>
 </body>
 </html>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://oppoi322.github.io/holdem/index.html" data-id="cuidQR1ClpbB4AxrSSZP_Q1gW" data-title="" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://oppoi322.github.io/holdem/index.html" data-id="cuidMixafj4lFM7F1e8IBKkHG" data-title="" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
