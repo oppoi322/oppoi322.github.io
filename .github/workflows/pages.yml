@@ -33,6 +33,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
+        env:
+          TZ: Asia/Shanghai
         run: |
           pnpm exec hexo clean
           pnpm exec hexo generate
