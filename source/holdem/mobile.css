@@ -4,18 +4,19 @@
 
 .oval{
   width: 100%;
-  height: min(64vh, 520px);
+  /* Smaller table so there is room for cards outside */
+  height: min(52vh, 420px);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: radial-gradient(900px 500px at 50% 20%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 55%),
               linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.10));
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* allow outside cards */
 }
 
 .oval-inner{
   position:absolute;
-  inset: 14px;
+  inset: 12px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.10);
   background: radial-gradient(800px 400px at 50% 30%, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 60%);
@@ -41,9 +42,9 @@
 
 .m-seat{
   position:absolute;
-  width: 34%;
-  max-width: 200px;
-  min-width: 120px;
+  width: 32%;
+  max-width: 180px;
+  min-width: 112px;
   padding: 8px;
   border-radius: 12px;
   background: rgba(0,0,0,.18);
@@ -54,12 +55,12 @@
 
 /* Cards should sit OUTSIDE the felt (like real players holding cards) */
 .m-seat .row3{position: absolute; left: 8px; right: 8px; display:flex; gap:6px;}
-#m-seat-0 .row3{top: -62px; justify-content:center;}
-#m-seat-3 .row3{bottom: -62px; justify-content:center;}
-#m-seat-1 .row3{right: -72px; top: 50%; transform: translateY(-50%);}
-#m-seat-2 .row3{right: -72px; top: 50%; transform: translateY(-50%);}
-#m-seat-4 .row3{left: -72px; top: 50%; transform: translateY(-50%);}
-#m-seat-5 .row3{left: -72px; top: 50%; transform: translateY(-50%);}
+#m-seat-0 .row3{top: -56px; justify-content:center;}
+#m-seat-3 .row3{bottom: -56px; justify-content:center;}
+#m-seat-1 .row3{right: -64px; top: 50%; transform: translateY(-50%);}
+#m-seat-2 .row3{right: -64px; top: 50%; transform: translateY(-50%);}
+#m-seat-4 .row3{left: -64px; top: 50%; transform: translateY(-50%);}
+#m-seat-5 .row3{left: -64px; top: 50%; transform: translateY(-50%);}
 .m-seat .row1{display:flex; justify-content:space-between; gap:8px; align-items:center; font-weight:800; font-size:12px;}
 .m-seat .row2{display:flex; justify-content:space-between; gap:8px; font-size:11px; opacity:.9; margin-top:4px;}
 
