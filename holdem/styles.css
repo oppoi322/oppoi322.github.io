@@ -6,19 +6,20 @@
 
   --bg: var(--felt);
 
-  /* Light panels so black text is readable */
-  --panel: rgba(255,255,255,.72);
-  --panel-strong: rgba(255,255,255,.82);
+  /* Panels: switch from white to felt green (match blog background) */
+  --panel: rgba(40,96,64,.55);
+  --panel-strong: rgba(40,96,64,.72);
 
-  /* Text: switch to black as requested */
+  /* Text: keep black as you requested */
   --text:#0b120d;
-  --muted: rgba(11,18,13,.72);
+  --muted: rgba(11,18,13,.76);
 
   --accent:#1f5f43;    /* dark felt accent */
   --danger:#ff0033;    /* vivid red */
   --ok:#0a7a58;
   --chip: rgba(255,255,255,.78);
-  --border:rgba(0,0,0,.16);
+  /* Use light borders on green panels */
+  --border:rgba(255,255,255,.18);
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -57,7 +58,7 @@ body{
   min-height:520px;
 }
 .table-inner{display:flex; flex-direction:column; gap:14px; height:100%;}
-.board{padding:12px; border-radius:14px; border:1px solid var(--border); background:var(--panel)}
+.board{padding:12px; border-radius:14px; border:1px solid var(--border); background:var(--panel); color: var(--text);}
 .board .row{display:flex; align-items:center; gap:10px; justify-content:space-between;}
 .board .label{color:var(--muted); font-size:12px; width:72px; flex:0 0 auto;}
 .board .cards{display:flex; gap:8px; justify-content:flex-start; flex:1;}
@@ -73,7 +74,7 @@ body{
 .seat.active{outline:2px solid rgba(78,161,255,.65)}
 .seat.folded{opacity:.55}
 
-.panel{border:1px solid var(--border); border-radius:16px; background:var(--panel-strong); padding:14px;}
+.panel{border:1px solid var(--border); border-radius:16px; background:var(--panel-strong); padding:14px; color: var(--text);}
 .panel h2{margin:0 0 10px 0; font-size:14px; color:var(--text)}
 .you{border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:12px;}
 .stack{margin-top:8px; color:var(--muted); font-size:12px;}
@@ -122,7 +123,8 @@ body{
 .btn{
   appearance:none; border:1px solid var(--border);
   background: rgba(0,0,0,.22);
-  color:var(--text); padding:10px 12px; border-radius:12px;
+  color: var(--text);
+  padding:10px 12px; border-radius:12px;
   font-weight:700; cursor:pointer;
 }
 .btn:hover{border-color:rgba(255,209,102,.55)}
@@ -146,7 +148,7 @@ body{
 .note{margin-top:12px; color:var(--muted); font-size:12px; line-height:1.4}
 
 .log{margin-top:12px; border-top:1px solid var(--border); padding-top:12px;}
-.log-box{height:220px; overflow:auto; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--panel); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; color:var(--text)}
+.log-box{height:220px; overflow:auto; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--panel); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; color:var(--text);}
 .log-line{margin:0 0 6px 0; white-space:pre-wrap;}
 
 .footer{margin-top:14px; text-align:center; color:var(--muted); font-size:12px;}
