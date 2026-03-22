@@ -1,5 +1,6 @@
 ---
 title: 911 之后的航空业，能推演出「Agent 必须人类审批」吗？我不同意，但我更担心另一件事
+published: false
 date: 2026-03-23 02:55:00
 tags:
   - AI
