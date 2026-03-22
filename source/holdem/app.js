@@ -208,6 +208,11 @@
     handOver: false,
     awaitingHuman: false,
     actionLock: false,
+
+    // auto-next-hand
+    autoNext: true,
+    autoNextDelayMs: 1200,
+    autoTimer: null,
   };
 
   function log(msg){
@@ -217,6 +222,21 @@
     p.textContent = msg;
     box.appendChild(p);
     box.scrollTop = box.scrollHeight;
+  }
+
+  function scheduleAutoNextHand(){
+    if(!GAME.autoNext) return;
+    // If someone is busted and only one player has chips, don't loop forever.
+    const alive = GAME.seats.filter(s => seatAlive(s));
+    if(alive.length <= 1){
+      log('\n（游戏结束：只剩一位玩家有筹码。请点“重置筹码”重新开始。）');
+      return;
+    }
+
+    if(GAME.autoTimer) clearTimeout(GAME.autoTimer);
+    GAME.autoTimer = setTimeout(()=>{
+      if(GAME.handOver) newHand();
+    }, GAME.autoNextDelayMs);
   }
 
   function fmt(n){
@@ -503,6 +523,8 @@
     GAME.pot=0;
     GAME.handOver=true;
     render();
+
+    scheduleAutoNextHand();
   }
 
   function advanceStreet(){
@@ -569,6 +591,8 @@
     GAME.pot=0;
     GAME.handOver=true;
     render();
+
+    scheduleAutoNextHand();
   }
 
   function commitChips(idx, toBet){
@@ -770,13 +794,6 @@
   // ---------- UI wiring
   function setupUI(){
     $('btnNewGame').addEventListener('click', ()=>newGame());
-    $('btnNewHand').addEventListener('click', ()=>{
-      if(!GAME.handOver){
-        log('当前手牌未结束，无法开始新的一局。');
-        return;
-      }
-      newHand();
-    });
 
     $('btnFold').addEventListener('click', ()=>humanFold());
     $('btnCheckCall').addEventListener('click', ()=>humanCheckCall());
