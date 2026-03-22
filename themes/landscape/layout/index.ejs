@@ -1,11 +1,23 @@
 <%
+  // Hexo gives page.posts as a special collection (not always a plain Array).
+  // Convert to Array defensively, then render sticky posts first.
   const posts = page.posts;
-  const stickyPosts = posts.filter(p => p.sticky && p.sticky > 0).sort((a,b) => b.sticky - a.sticky);
-  const normalPosts = posts.filter(p => !p.sticky || p.sticky <= 0);
-  const ordered = stickyPosts.concat(normalPosts);
+  const arr = (posts && typeof posts.toArray === 'function')
+    ? posts.toArray()
+    : (posts && posts.data ? posts.data : (posts || []));
+
+  const isSticky = (p) => p && p.sticky && p.sticky > 0;
+
+  const sticky = arr
+    .filter(isSticky)
+    .sort((a, b) => (b.sticky || 0) - (a.sticky || 0) || (b.date - a.date));
+
+  const normal = arr.filter(p => !isSticky(p));
+  const ordered = sticky.concat(normal);
 %>
-<% ordered.each(function(post, i){ %>
-  <%- partial('_partial/archive-post', {post: post, even: i % 2 == 0}) %>
+
+<% ordered.forEach(function(post, i){ %>
+  <%- partial('_partial/archive-post', {post: post, even: i % 2 === 0, index: true}) %>
 <% }) %>
 
 <% if (page.total > 1){ %>
