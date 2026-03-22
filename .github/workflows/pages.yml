@@ -37,6 +37,22 @@ jobs:
           pnpm exec hexo clean
           pnpm exec hexo generate
 
+      # Guardrail: stop the workflow before deploying if the generated site is broken/empty.
+      # This prevents cases where `public/index.html` becomes 0 bytes (white page online).
+      - name: Validate build output
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -d public
+          test -s public/index.html
+
+          # Basic sanity: make sure it's real HTML, not an empty/partial file.
+          grep -qi "<html" public/index.html
+
+          echo "OK: public/index.html size=$(wc -c < public/index.html) bytes"
+          echo "OK: total files=$(find public -type f | wc -l)"
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
