@@ -1,1 +1,16 @@
-<%- partial('_partial/archive', {expand: false, index: true}) %>
+<%
+  const posts = page.posts;
+  const stickyPosts = posts.filter(p => p.sticky && p.sticky > 0).sort((a,b) => b.sticky - a.sticky);
+  const normalPosts = posts.filter(p => !p.sticky || p.sticky <= 0);
+  const ordered = stickyPosts.concat(normalPosts);
+%>
+<% ordered.each(function(post, i){ %>
+  <%- partial('_partial/archive-post', {post: post, even: i % 2 == 0}) %>
+<% }) %>
+
+<% if (page.total > 1){ %>
+  <nav id="page-nav">
+    <% var prev_text = "&laquo; " + __('prev');var next_text = __('next') + " &raquo;"%>
+    <%- paginator({ prev_text: prev_text, next_text: next_text, escape: false }) %>
+  </nav>
+<% } %>
