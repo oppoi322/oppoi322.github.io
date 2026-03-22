@@ -1,28 +1,35 @@
 :root{
-  --bg:#0b1220;
-  --panel:#111a2f;
-  --card:#161f38;
-  --muted:#97a3b6;
-  --text:#eaf0ff;
-  --accent:#4ea1ff;
+  /* Casino felt theme (green) */
+  --felt-dark:#064027;
+  --felt:#0b6b43;
+  --felt-light:#179b63;
+
+  --bg: var(--felt-dark);
+  --panel: rgba(8, 20, 14, .55);
+  --panel-strong: rgba(8, 20, 14, .72);
+
+  --muted:#cfe4d7;
+  --text:#f2fff8;
+  --accent:#ffd166;
   --danger:#ff4d6d;
   --ok:#3ddc97;
-  --chip:#2b3554;
-  --border:rgba(255,255,255,.08);
+  --chip:#123827;
+  --border:rgba(255,255,255,.10);
 }
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
   margin:0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "PingFang SC","Noto Sans CJK SC","Microsoft YaHei", sans-serif;
-  background: radial-gradient(1200px 800px at 50% -10%, #1b2a56 0%, var(--bg) 60%);
+  background: radial-gradient(1200px 800px at 50% -10%, var(--felt-light) 0%, var(--felt) 35%, var(--bg) 75%);
   color:var(--text);
 }
 .app{max-width:1200px;margin:0 auto; padding:16px;}
 .topbar{
   display:flex; gap:12px; align-items:center; justify-content:space-between;
   padding:12px 14px; border:1px solid var(--border); border-radius:14px;
-  background:rgba(17,26,47,.65); backdrop-filter: blur(6px);
+  background:var(--panel-strong);
+  backdrop-filter: blur(6px);
 }
 .brand .title{font-weight:700; font-size:18px;}
 .brand .subtitle{color:var(--muted); font-size:12px; margin-top:2px;}
@@ -31,20 +38,20 @@ body{
 .layout{display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; margin-top:14px;}
 .table{
   border:1px solid var(--border);
-  background: linear-gradient(180deg, rgba(22,31,56,.65), rgba(17,26,47,.55));
+  background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.10));
   border-radius:16px;
   padding:14px;
   min-height:520px;
 }
 .table-inner{display:flex; flex-direction:column; gap:14px; height:100%;}
-.board{padding:12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.12)}
+.board{padding:12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.22)}
 .board .row{display:flex; align-items:center; gap:10px; justify-content:space-between;}
 .board .label{color:var(--muted); font-size:12px; width:72px; flex:0 0 auto;}
 .board .cards{display:flex; gap:8px; justify-content:flex-start; flex:1;}
 .board .meta{margin-top:10px; color:var(--muted); font-size:12px; justify-content:space-between; flex-wrap:wrap;}
 
 .seats{display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; flex:1; align-content:start;}
-.seat{border:1px solid var(--border); background:rgba(0,0,0,.12); border-radius:14px; padding:10px; min-height:110px;}
+.seat{border:1px solid var(--border); background:rgba(0,0,0,.20); border-radius:14px; padding:10px; min-height:110px;}
 .seat .name{display:flex; justify-content:space-between; align-items:center; gap:8px;}
 .seat .who{font-weight:650; font-size:13px;}
 .seat .style{color:var(--muted); font-size:11px;}
@@ -53,7 +60,7 @@ body{
 .seat.active{outline:2px solid rgba(78,161,255,.65)}
 .seat.folded{opacity:.55}
 
-.panel{border:1px solid var(--border); border-radius:16px; background:rgba(17,26,47,.65); padding:14px;}
+.panel{border:1px solid var(--border); border-radius:16px; background:var(--panel-strong); padding:14px;}
 .panel h2{margin:0 0 10px 0; font-size:14px;}
 .you{border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:12px;}
 .stack{margin-top:8px; color:var(--muted); font-size:12px;}
@@ -100,13 +107,14 @@ body{
 }
 
 .btn{
-  appearance:none; border:1px solid var(--border); background:rgba(0,0,0,.15);
+  appearance:none; border:1px solid var(--border);
+  background: rgba(0,0,0,.22);
   color:var(--text); padding:10px 12px; border-radius:12px;
-  font-weight:650; cursor:pointer;
+  font-weight:700; cursor:pointer;
 }
-.btn:hover{border-color:rgba(78,161,255,.45)}
+.btn:hover{border-color:rgba(255,209,102,.55)}
 .btn:disabled{opacity:.45; cursor:not-allowed}
-.btn-primary{background: rgba(78,161,255,.15); border-color: rgba(78,161,255,.45)}
+.btn-primary{background: rgba(255,209,102,.18); border-color: rgba(255,209,102,.55)}
 .btn-secondary{background: rgba(255,255,255,.06)}
 .btn-danger{background: rgba(255,77,109,.12); border-color: rgba(255,77,109,.38)}
 
