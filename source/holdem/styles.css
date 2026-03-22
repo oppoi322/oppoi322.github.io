@@ -72,13 +72,32 @@ body{
 }
 .card.small{width:34px;height:48px;font-size:12px;border-radius:9px}
 .card.red{color:#c1121f}
+
+/* Make face-down (AI) cards stand out more on dark seat panels */
 .card.back{
   color:transparent;
   position:relative;
-  background: linear-gradient(135deg, #1c2744, #0b1220);
-  border:1px solid rgba(255,255,255,.14);
+  background: linear-gradient(135deg, #2a3d7a, #0b1220);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow: 0 10px 22px rgba(0,0,0,.28), 0 0 0 1px rgba(78,161,255,.10) inset;
 }
-.card.back::after{content:""; position:absolute; inset:8px; border-radius:8px; background: repeating-linear-gradient(45deg, rgba(78,161,255,.45), rgba(78,161,255,.45) 6px, rgba(255,255,255,.08) 6px, rgba(255,255,255,.08) 12px);}
+.card.back::after{
+  content:"";
+  position:absolute;
+  inset:7px;
+  border-radius:8px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.14) 0%, rgba(255,255,255,0) 55%),
+    repeating-linear-gradient(45deg,
+      rgba(78,161,255,.60), rgba(78,161,255,.60) 6px,
+      rgba(255,255,255,.12) 6px, rgba(255,255,255,.12) 12px
+    );
+}
+
+/* When user enables desktop mode on phone, make small opponent cards less tiny */
+@media (max-width: 520px){
+  .card.small{width:38px;height:54px;font-size:13px}
+}
 
 .btn{
   appearance:none; border:1px solid var(--border); background:rgba(0,0,0,.15);
