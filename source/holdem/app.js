@@ -378,8 +378,9 @@
         mcc.appendChild(renderCard(c,false,false));
       }
 
-      // map seats to positions: 0 hero bottom, 3 top, 1 left-bottom, 2 left-top, 4 right-top, 5 right-bottom
-      const map = [0, 2, 3, 4, 5, 1];
+      // map seats to fixed positions (6-max)
+      // pos: 0 hero bottom, 1 left-bottom, 2 left-top, 3 top, 4 right-top, 5 right-bottom
+      const map = [0, 1, 2, 3, 4, 5];
       for(let pos=0; pos<6; pos++){
         const seatIdx = map[pos];
         const box = document.getElementById('m-seat-'+pos);
