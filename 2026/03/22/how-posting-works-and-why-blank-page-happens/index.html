@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>文章是怎么“上传并生效”的？以及为什么有时会出现白屏 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="很多人第一次用 Hexo + GitHub Pages 时都会有一个直觉：  “我是不是把 Markdown 文件上传到仓库里就行了？”  答案是：对于这个站点来说，Markdown 只是“源码的一部分”。真正对外提供访问的是 构建后的静态 HTML。 这篇文章把两件事说清楚：  正常写文章、发布上线的标准流程 为什么有时候明明只是改了点东西，却会导致首页白屏（以及如何避免）   1. 这个仓库里">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文章是怎么“上传并生效”的？以及为什么有时会出现白屏">
+<meta property="og:url" content="http://example.com/2026/03/22/how-posting-works-and-why-blank-page-happens/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="很多人第一次用 Hexo + GitHub Pages 时都会有一个直觉：  “我是不是把 Markdown 文件上传到仓库里就行了？”  答案是：对于这个站点来说，Markdown 只是“源码的一部分”。真正对外提供访问的是 构建后的静态 HTML。 这篇文章把两件事说清楚：  正常写文章、发布上线的标准流程 为什么有时候明明只是改了点东西，却会导致首页白屏（以及如何避免）   1. 这个仓库里">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-03-22T23:40:00.000Z">
+<meta property="article:modified_time" content="2026-03-22T15:41:31.199Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="GitHub Actions">
+<meta property="article:tag" content="GitHub Pages">
+<meta property="article:tag" content="Hexo">
+<meta property="article:tag" content="复盘">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-how-posting-works-and-why-blank-page-happens" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/03/22/how-posting-works-and-why-blank-page-happens/" class="article-date">
+  <time class="dt-published" datetime="2026-03-22T23:40:00.000Z" itemprop="datePublished">2026-03-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      文章是怎么“上传并生效”的？以及为什么有时会出现白屏
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>很多人第一次用 Hexo + GitHub Pages 时都会有一个直觉：</p>
+<blockquote>
+<p>“我是不是把 Markdown 文件上传到仓库里就行了？”</p>
+</blockquote>
+<p>答案是：<strong>对于这个站点来说，Markdown 只是“源码的一部分”</strong>。真正对外提供访问的是 <em>构建后的静态 HTML</em>。</p>
+<p>这篇文章把两件事说清楚：</p>
+<ol>
+<li>正常写文章、发布上线的标准流程</li>
+<li>为什么有时候明明只是改了点东西，却会导致首页白屏（以及如何避免）</li>
+</ol>
+<hr>
+<h2 id="1-这个仓库里到底有什么？（源码-vs-产物）"><a href="#1-这个仓库里到底有什么？（源码-vs-产物）" class="headerlink" title="1. 这个仓库里到底有什么？（源码 vs 产物）"></a>1. 这个仓库里到底有什么？（源码 vs 产物）</h2><p>这个博客用的是典型的 GitHub Pages 工作流：</p>
+<ul>
+<li><p><code>main</code> 分支：存 <strong>源码</strong></p>
+<ul>
+<li><code>source/_posts/*.md</code>：文章 Markdown</li>
+<li><code>themes/landscape/**</code>：主题模板（EJS）、样式、脚本</li>
+<li><code>.github/workflows/pages.yml</code>：Actions 构建 + 发布脚本</li>
+</ul>
+</li>
+<li><p><code>gh-pages</code> 分支：存 <strong>产物</strong>（构建结果）</p>
+<ul>
+<li><code>index.html</code></li>
+<li><code>about/index.html</code></li>
+<li><code>2026/03/22/.../index.html</code></li>
+<li><code>css/</code>、<code>js/</code>、图片等</li>
+</ul>
+</li>
+</ul>
+<p>GitHub Pages 对外提供的，其实就是 <code>gh-pages</code> 分支里的那堆 HTML&#x2F;CSS&#x2F;JS 文件。</p>
+<blockquote>
+<p>换句话说：你打开网页时，浏览器根本不会“现场解析 Markdown”。它只会拿到已经生成好的 HTML。</p>
+</blockquote>
+<hr>
+<h2 id="2-正常发布文章的流程（最推荐的做法）"><a href="#2-正常发布文章的流程（最推荐的做法）" class="headerlink" title="2. 正常发布文章的流程（最推荐的做法）"></a>2. 正常发布文章的流程（最推荐的做法）</h2><h3 id="2-1-写文章"><a href="#2-1-写文章" class="headerlink" title="2.1 写文章"></a>2.1 写文章</h3><p>在仓库里新增&#x2F;编辑：</p>
+<ul>
+<li><code>source/_posts/xxx.md</code></li>
+</ul>
+<p>建议写作时用 <code>&lt;!-- more --&gt;</code> 控制摘要（之前我已经加了 <code>excerpt_separator</code> 配置）。</p>
+<h3 id="2-2-提交源码"><a href="#2-2-提交源码" class="headerlink" title="2.2 提交源码"></a>2.2 提交源码</h3><p>把修改 commit 到 <code>main</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add -A</span><br><span class="line">git commit -m <span class="string">&quot;Add post&quot;</span></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-GitHub-Actions-自动构建"><a href="#2-3-GitHub-Actions-自动构建" class="headerlink" title="2.3 GitHub Actions 自动构建"></a>2.3 GitHub Actions 自动构建</h3><p>推送到 <code>main</code> 后，Actions 会自动执行：</p>
+<ol>
+<li>安装依赖（pnpm）</li>
+<li><code>hexo clean</code></li>
+<li><code>hexo generate</code> → 生成 <code>public/</code></li>
+<li>把 <code>public/</code> 发布到 <code>gh-pages</code> 分支</li>
+</ol>
+<h3 id="2-4-GitHub-Pages-提供访问"><a href="#2-4-GitHub-Pages-提供访问" class="headerlink" title="2.4 GitHub Pages 提供访问"></a>2.4 GitHub Pages 提供访问</h3><p>Pages 配置指向：</p>
+<ul>
+<li>source: <code>gh-pages</code> 分支 <code>/</code> 根目录</li>
+</ul>
+<p>所以只要 <code>gh-pages</code> 更新成功，你刷新网页就会看到新文章。</p>
+<hr>
+<h2 id="3-为什么“上传”会导致白屏？（核心原因）"><a href="#3-为什么“上传”会导致白屏？（核心原因）" class="headerlink" title="3. 为什么“上传”会导致白屏？（核心原因）"></a>3. 为什么“上传”会导致白屏？（核心原因）</h2><p>白屏通常不是因为“文章写坏了”，而是因为 <strong>构建产物坏了</strong>。</p>
+<p>最常见的触发方式是：</p>
+<ul>
+<li>改了主题模板（例如 <code>themes/landscape/layout/index.ejs</code>）</li>
+<li>模板里有语法错误&#x2F;变量未定义</li>
+<li><code>hexo generate</code> 在生成某个页面（尤其是首页 <code>index.html</code>）时出错</li>
+<li>导致生成出来的 <code>public/index.html</code> 是空的（0 字节）或不完整</li>
+<li>这个坏的 <code>index.html</code> 被发布到 <code>gh-pages</code></li>
+<li>浏览器访问首页，拿到的就是空文件 → 看起来像“全白”</li>
+</ul>
+<p>这次我们遇到的就是这种情况：为了做“置顶 sticky”，我修改了首页模板，第一次版本里没有正确处理 Hexo 的 posts 集合和主题里依赖的变量（例如 <code>index</code>），导致生成失败，最终 <code>index.html</code> 变成了 0 字节。</p>
+<hr>
+<h2 id="4-如何降低白屏概率（实践建议）"><a href="#4-如何降低白屏概率（实践建议）" class="headerlink" title="4. 如何降低白屏概率（实践建议）"></a>4. 如何降低白屏概率（实践建议）</h2><ol>
+<li><p><strong>写文章尽量只改 <code>source/_posts/</code></strong></p>
+<ul>
+<li>纯内容改动，风险最低。</li>
+</ul>
+</li>
+<li><p><strong>改主题&#x2F;模板前先本地生成一次</strong></p>
+</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pnpm <span class="built_in">exec</span> hexo clean</span><br><span class="line">pnpm <span class="built_in">exec</span> hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>确保本地 <code>public/index.html</code> 不是 0 字节，并且能打开。</p>
+<ol start="3">
+<li><strong>关注 Actions 的构建日志</strong></li>
+</ol>
+<p>如果页面异常，第一时间看：</p>
+<ul>
+<li>GitHub → Actions → 最新一次工作流是否 success</li>
+</ul>
+<ol start="4">
+<li><strong>知道“白屏”往往是首页 HTML 出问题</strong></li>
+</ol>
+<p>可以快速验证：</p>
+<ul>
+<li>访问 <code>https://oppoi322.github.io/</code> 看是否返回空内容</li>
+<li>或看 <code>gh-pages</code> 分支的 <code>index.html</code> 是否异常（0 字节）</li>
+</ul>
+<hr>
+<h2 id="5-复盘：这次白屏是怎么修好的"><a href="#5-复盘：这次白屏是怎么修好的" class="headerlink" title="5. 复盘：这次白屏是怎么修好的"></a>5. 复盘：这次白屏是怎么修好的</h2><p>思路很直接：</p>
+<ol>
+<li>先确认现象：HTTP 200 但内容长度为 0</li>
+<li>确认根因：<code>gh-pages/index.html</code> 是空文件</li>
+<li>本地复现：运行 <code>hexo generate --debug</code> 定位模板报错</li>
+<li>修正模板：保证首页模板能正常渲染</li>
+<li>重新发布：让 Actions 生成新的 <code>public/</code> 并发布到 <code>gh-pages</code></li>
+</ol>
+<hr>
+<p>如果你希望把这套流程做得更“像产品”，下一步还可以加一个小检查：当构建出来的 <code>public/index.html</code> 为空时，让 CI 直接失败并阻止发布——这样就不会再把空白首页推到线上。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/03/22/how-posting-works-and-why-blank-page-happens/" data-id="cuidyl0fMm2XRohohxgbqZFn4" data-title="文章是怎么“上传并生效”的？以及为什么有时会出现白屏" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GitHub-Actions/" rel="tag">GitHub Actions</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%A4%8D%E7%9B%98/" rel="tag">复盘</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2026/03/22/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+  
+  <section id="comments" class="utterances">
+    <h2>Comments</h2>
+    <script
+      src="https://utteranc.es/client.js"
+      repo="oppoi322/oppoi322.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/GitHub-Actions/" rel="tag">GitHub Actions</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/landscape/" rel="tag">landscape</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/utterances/" rel="tag">utterances</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%BB%E9%A2%98/" rel="tag">主题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%B3%E4%BA%8E/" rel="tag">关于</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%8D%E7%9B%98/" rel="tag">复盘</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" rel="tag">评论系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%83%A8%E7%BD%B2/" rel="tag">部署</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/GitHub-Actions/" style="font-size: 13.33px;">GitHub Actions</a> <a href="/tags/GitHub-Pages/" style="font-size: 16.67px;">GitHub Pages</a> <a href="/tags/Hexo/" style="font-size: 20px;">Hexo</a> <a href="/tags/landscape/" style="font-size: 10px;">landscape</a> <a href="/tags/utterances/" style="font-size: 10px;">utterances</a> <a href="/tags/%E4%B8%BB%E9%A2%98/" style="font-size: 10px;">主题</a> <a href="/tags/%E5%85%B3%E4%BA%8E/" style="font-size: 10px;">关于</a> <a href="/tags/%E5%8D%9A%E5%AE%A2/" style="font-size: 10px;">博客</a> <a href="/tags/%E5%A4%8D%E7%9B%98/" style="font-size: 10px;">复盘</a> <a href="/tags/%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">评论系统</a> <a href="/tags/%E9%83%A8%E7%BD%B2/" style="font-size: 10px;">部署</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">March 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/03/22/how-posting-works-and-why-blank-page-happens/">文章是怎么“上传并生效”的？以及为什么有时会出现白屏</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/22/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/about/">关于我：写在 oppoi322.github.io 的第一篇自我介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/22/make-homepage-title-list/">把 Hexo 首页从“全文展开”改成“标题列表”</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/22/how-i-added-comments-with-utterances/">给 Hexo + GitHub Pages 加评论：utterances（用 GitHub Issues 作为评论存储）</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
