@@ -61,15 +61,24 @@ body{
 .cards{display:flex; gap:8px; flex-wrap:wrap;}
 .card{
   width:44px; height:60px; border-radius:10px;
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
-  border:1px solid var(--border);
+  /* Make cards look like real cards: light face + strong black/red */
+  background: linear-gradient(180deg, #ffffff, #eef2f7);
+  border:1px solid rgba(0,0,0,.16);
+  box-shadow: 0 10px 22px rgba(0,0,0,.22);
+  color:#111;
   display:flex; align-items:center; justify-content:center;
-  font-weight:750;
+  font-weight:800;
+  letter-spacing: .2px;
 }
 .card.small{width:34px;height:48px;font-size:12px;border-radius:9px}
-.card.red{color:#ff6b81}
-.card.back{color:transparent; position:relative}
-.card.back::after{content:""; position:absolute; inset:8px; border-radius:8px; background: repeating-linear-gradient(45deg, rgba(78,161,255,.35), rgba(78,161,255,.35) 6px, rgba(255,255,255,.06) 6px, rgba(255,255,255,.06) 12px);}
+.card.red{color:#c1121f}
+.card.back{
+  color:transparent;
+  position:relative;
+  background: linear-gradient(135deg, #1c2744, #0b1220);
+  border:1px solid rgba(255,255,255,.14);
+}
+.card.back::after{content:""; position:absolute; inset:8px; border-radius:8px; background: repeating-linear-gradient(45deg, rgba(78,161,255,.45), rgba(78,161,255,.45) 6px, rgba(255,255,255,.08) 6px, rgba(255,255,255,.08) 12px);}
 
 .btn{
   appearance:none; border:1px solid var(--border); background:rgba(0,0,0,.15);
