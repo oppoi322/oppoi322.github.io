@@ -1,6 +1,7 @@
 ---
 title: 关于我：写在 oppoi322.github.io 的第一篇自我介绍
 date: 2026-03-22 15:29:00
+sticky: 1
 tags:
   - 关于
   - 博客
