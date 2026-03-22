@@ -4,8 +4,9 @@
 # Navigation menu
 menu:
   Home: /
-  About: /about
+  Categories: /categories
   Archives: /archives
+  About: /about
 # RSS link
 rss: /atom.xml
 # Path of title banner image of page top
@@ -44,10 +45,9 @@ copyright:
 # Sidebar style. You can choose `left`, `right`, `bottom` or `false`.
 sidebar: right
 # Widgets displaying in sidebar
+# Keep it minimal: focus on clear classification and navigation.
 widgets:
 - category
-- tag
-- tagcloud
 - archive
 - recent_posts
 
@@ -55,9 +55,9 @@ widgets:
 # Widget behavior
 # ===============
 archive_type: 'monthly'
-show_count: false
-# How many posts display in Home page.
-recent_posts_limits: 5
+show_count: true
+# How many posts display in sidebar.
+recent_posts_limits: 3
 
 # ===============
 # Miscellaneous
