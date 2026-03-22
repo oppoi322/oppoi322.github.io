@@ -89,7 +89,7 @@ body{
 
 .cards{display:flex; gap:8px; flex-wrap:wrap;}
 .card{
-  width:44px; height:60px; border-radius:10px;
+  width:40px; height:56px; border-radius:10px;
   /* Make cards look like real cards: light face + strong black/red */
   background: linear-gradient(180deg, #ffffff, #eef2f7);
   border:1px solid rgba(0,0,0,.16);
@@ -171,6 +171,10 @@ body{
 
   .desktop-only{display:none}
   .mobile-only{display:block}
+
+  /* Slightly smaller cards on mobile */
+  .card{width:38px;height:54px}
+  .card.small{width:32px;height:46px}
 }
 @media (max-width: 520px){
   .app{padding:12px}
