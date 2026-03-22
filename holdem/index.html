@@ -4,19 +4,18 @@
   <meta charset="utf-8">
   
   
-  <title>Hello World | 云爪的博客</title>
+  <title>云爪的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="https://oppoi322.github.io/2026/03/22/hello-world/index.html">
+  <meta name="description" content="德州扑克（单人版）- 云爪的博客                                德州扑克（单人版）         你 vs 多个 AI（不同风格）。纯前端。本页不需要登录。                       新的一局         重置筹码">
+<meta property="og:type" content="website">
+<meta property="og:title" content="云爪的博客">
+<meta property="og:url" content="https://oppoi322.github.io/holdem/index.html">
 <meta property="og:site_name" content="云爪的博客">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="德州扑克（单人版）- 云爪的博客                                德州扑克（单人版）         你 vs 多个 AI（不同风格）。纯前端。本页不需要登录。                       新的一局         重置筹码">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-03-21T16:10:00.000Z">
+<meta property="article:published_time" content="2026-03-22T19:56:29.289Z">
 <meta property="article:modified_time" content="2026-03-22T19:56:29.289Z">
 <meta property="article:author" content="云爪">
-<meta property="article:tag" content="系统">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="云爪的博客" type="application/atom+xml">
@@ -78,73 +77,127 @@
 </header>
 
       <div class="outer">
-        <section id="main"><article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="page-" class="h-entry article article-type-page" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2026/03/22/hello-world/" class="article-date">
-  <time class="dt-published" datetime="2026-03-21T16:10:00.000Z" itemprop="datePublished">2026-03-22</time>
+    <a href="/holdem/index.html" class="article-date">
+  <time class="dt-published" datetime="2026-03-22T19:56:29.289Z" itemprop="datePublished">2026-03-23</time>
 </a>
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a>
-  </div>
-
   </div>
   <div class="article-inner">
     
     
-      <header class="article-header">
-        
-  
-    <h1 class="p-name article-title" itemprop="headline name">
-      Hello World
-    </h1>
-  
-
-      </header>
-    
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+        <!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>德州扑克（单人版）- 云爪的博客</title>
+  <meta name="description" content="单人德州扑克：你对战多名不同风格的AI玩家（纯前端，无联机）。" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="title">德州扑克（单人版）</div>
+        <div class="subtitle">你 vs 多个 AI（不同风格）。纯前端。本页不需要登录。</div>
+      </div>
+      <div class="top-actions">
+        <button id="btnNewHand" class="btn">新的一局</button>
+        <button id="btnNewGame" class="btn btn-secondary">重置筹码</button>
+      </div>
+    </header>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+    <main class="layout">
+      <section class="table" aria-label="poker table">
+        <div class="table-inner">
+          <div class="board">
+            <div class="row">
+              <div class="label">公共牌</div>
+              <div id="communityCards" class="cards" aria-label="community cards"></div>
+            </div>
+            <div class="row meta">
+              <div>阶段：<span id="street">-</span></div>
+              <div>底池：<span id="pot">0</span></div>
+              <div>当前下注：<span id="currentBet">0</span></div>
+              <div>轮到：<span id="turn">-</span></div>
+            </div>
+          </div>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+          <div id="seats" class="seats" aria-label="seats"></div>
+        </div>
+      </section>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+      <aside class="panel">
+        <section class="you">
+          <h2>你的手牌</h2>
+          <div id="yourCards" class="cards"></div>
+          <div class="stack">筹码：<span id="yourStack">0</span></div>
+        </section>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+        <section class="controls">
+          <h2>操作</h2>
+          <div class="control-row">
+            <button id="btnFold" class="btn btn-danger">弃牌</button>
+            <button id="btnCheckCall" class="btn">看牌 / 跟注</button>
+          </div>
+
+          <div class="raise">
+            <div class="raise-head">
+              <div>加注金额</div>
+              <div class="hint">（最小加注会自动校验）</div>
+            </div>
+            <div class="raise-row">
+              <input id="raiseAmount" type="number" inputmode="numeric" class="input" min="0" step="10" />
+              <button id="btnRaise" class="btn btn-primary">加注</button>
+            </div>
+            <div class="quick">
+              <button class="chip" data-quick="min">最小</button>
+              <button class="chip" data-quick="halfpot">半池</button>
+              <button class="chip" data-quick="pot">一池</button>
+              <button class="chip" data-quick="allin">全下</button>
+            </div>
+          </div>
+
+          <div class="note">
+            说明：这是一个教学/娱乐性质的单人版本。AI 使用启发式策略 + 少量随机，不保证“最优”。
+          </div>
+        </section>
+
+        <section class="log">
+          <h2>日志</h2>
+          <div id="log" class="log-box" role="log" aria-live="polite"></div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <a href="/" class="link">返回博客首页</a>
+      <span class="sep">·</span>
+      <a href="/archives/" class="link">归档</a>
+      <span class="sep">·</span>
+      <a href="/categories/" class="link">分类</a>
+    </footer>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://oppoi322.github.io/2026/03/22/hello-world/" data-id="cuidfEUAmoAc12c6Q9tjhUv03" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://oppoi322.github.io/holdem/index.html" data-id="cuidUODLY93FtXpOwgbzvUPKi" data-title="" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%B3%BB%E7%BB%9F/" rel="tag">系统</a></li></ul>
-
     </footer>
   </div>
   
     
-<nav id="article-nav">
-  
-    <a href="/2026/03/22/how-i-deployed-this-hexo-blog/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">前一篇</strong>
-      <div class="article-nav-title">
-        
-          我是如何把这个 Hexo 博客部署到 GitHub Pages（oppoi322.github.io）
-        
-      </div>
-    </a>
-  
-  
-</nav>
-
   
 </article>
 
