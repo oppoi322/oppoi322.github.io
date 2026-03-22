@@ -50,6 +50,11 @@ body{
 #btnNewGame{font-weight:800}
 
 .layout{display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; margin-top:14px;}
+
+/* Responsive helpers */
+.desktop-only{display:block}
+.mobile-only{display:none}
+
 .table{
   border:1px solid var(--border);
   background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.10));
@@ -163,6 +168,9 @@ body{
   .layout{grid-template-columns: 1fr;}
   .table{min-height:480px}
   .seats{grid-template-columns: repeat(2, 1fr)}
+
+  .desktop-only{display:none}
+  .mobile-only{display:block}
 }
 @media (max-width: 520px){
   .app{padding:12px}
