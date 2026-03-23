@@ -85,10 +85,15 @@
 /* Move player boxes OUTSIDE the oval */
 #m-seat-0{left:50%; top: calc(100% + 8px); transform: translateX(-50%);} 
 #m-seat-3{left:50%; bottom: calc(100% + 8px); transform: translateX(-50%);} 
-#m-seat-1{right: calc(100% + 8px); bottom: 18%;}
-#m-seat-2{right: calc(100% + 8px); top: 18%;}
-#m-seat-4{left: calc(100% + 8px); top: 18%;}
-#m-seat-5{left: calc(100% + 8px); bottom: 18%;}
+/* Side seats: keep them slightly outside the oval, but NOT off-screen */
+#m-seat-1{left: -6px; bottom: 18%;}
+#m-seat-2{left: -6px; top: 18%;}
+#m-seat-4{right: -6px; top: 18%;}
+#m-seat-5{right: -6px; bottom: 18%;}
+
+/* On side seats, align hole cards inward so they are fully visible */
+#m-seat-1 .row3, #m-seat-2 .row3{justify-content:flex-end;}
+#m-seat-4 .row3, #m-seat-5 .row3{justify-content:flex-start;}
 
 .actionbar{
   position: sticky;
