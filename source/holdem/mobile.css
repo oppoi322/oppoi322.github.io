@@ -76,12 +76,21 @@
   z-index: 6;
 }
 
+/* Ensure mobile seat status text is readable (black) */
+.m-seat .row2{color:#000;}
+
 /* Hole cards: keep them with the player, but place the whole player box OUTSIDE the table */
 #m-seat-1 .row3, #m-seat-2 .row3, #m-seat-4 .row3, #m-seat-5 .row3{gap:4px;}
 .m-seat .row3{display:flex; gap:5px; margin-top:6px; justify-content:center;}
 
 .m-seat .row1{display:flex; justify-content:space-between; gap:6px; align-items:center; font-weight:900; font-size:11px;}
 .m-seat .row2{display:flex; justify-content:space-between; gap:6px; font-size:10px; opacity:.92; margin-top:4px;}
+
+/* Status styles (used for per-hand settlement) */
+.m-seat .st{font-weight:800;}
+.m-seat .st.st-fold{color:#ff0033; font-weight:900;}
+.m-seat .st.st-hand{color:#000; font-weight:900;}
+.m-seat .st.st-win{color:#000; font-weight:900;}
 
 /* Seat positions (6-max)
    0 = hero bottom
