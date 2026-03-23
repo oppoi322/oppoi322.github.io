@@ -33,6 +33,7 @@
   border-radius: 14px;
   background: rgba(0,0,0,.14);
   border: 1px solid rgba(255,255,255,.12);
+  z-index: 2;
 }
 
 .center-top{display:flex; justify-content:center; gap:10px; font-size:13px; color: var(--text); opacity:.95; flex-wrap:wrap; font-weight:900;}
@@ -51,16 +52,19 @@
   border: 1px solid rgba(255,255,255,.12);
   color: var(--text);
   overflow: visible;
+  z-index: 3;
 }
 
 /* Cards should sit OUTSIDE the felt (like real players holding cards) */
-.m-seat .row3{position: absolute; left: 8px; right: 8px; display:flex; gap:6px;}
-#m-seat-0 .row3{top: -56px; justify-content:center;}
-#m-seat-3 .row3{bottom: -56px; justify-content:center;}
-#m-seat-1 .row3{right: -64px; top: 50%; transform: translateY(-50%);}
-#m-seat-2 .row3{right: -64px; top: 50%; transform: translateY(-50%);}
-#m-seat-4 .row3{left: -64px; top: 50%; transform: translateY(-50%);}
-#m-seat-5 .row3{left: -64px; top: 50%; transform: translateY(-50%);}
+.m-seat .row3{position: absolute; left: 8px; right: 8px; display:flex; gap:6px; z-index: 5;}
+#m-seat-0 .row3{top: -54px; justify-content:center;}
+#m-seat-3 .row3{bottom: -54px; justify-content:center;}
+
+/* Pull side cards closer to the seat box so they stay on-screen */
+#m-seat-1 .row3{right: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-start;}
+#m-seat-2 .row3{right: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-start;}
+#m-seat-4 .row3{left: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-end;}
+#m-seat-5 .row3{left: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-end;}
 .m-seat .row1{display:flex; justify-content:space-between; gap:8px; align-items:center; font-weight:800; font-size:12px;}
 .m-seat .row2{display:flex; justify-content:space-between; gap:8px; font-size:11px; opacity:.9; margin-top:4px;}
 
