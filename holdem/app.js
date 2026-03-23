@@ -270,7 +270,7 @@
 
     // auto-next-hand
     autoNext: true,
-    autoNextDelayMs: 1200,
+    autoNextDelayMs: 5000, // default 5s between hands
     autoTimer: null,
   };
 
@@ -285,6 +285,13 @@
 
   function scheduleAutoNextHand(){
     if(!GAME.autoNext) return;
+
+    // Apply UI-selected delay (mobile)
+    const sel = document.getElementById('m-nextDelay');
+    if(sel){
+      const v = Number(sel.value);
+      if(!Number.isNaN(v) && v>=0) GAME.autoNextDelayMs = v;
+    }
     // If someone is busted and only one player has chips, don't loop forever.
     const alive = GAME.seats.filter(s => seatAlive(s));
     if(alive.length <= 1){
@@ -990,7 +997,22 @@
       mAmt.addEventListener('change', ()=>{
         $('raiseAmount').value = String((mAmt).value||0);
       });
+    }
 
+    // between-hands controls (mobile)
+    const mDelay = document.getElementById('m-nextDelay');
+    if(mDelay){
+      mDelay.addEventListener('change', ()=>{
+        const v = Number(mDelay.value);
+        if(!Number.isNaN(v) && v>=0) GAME.autoNextDelayMs = v;
+      });
+    }
+    const mNext = document.getElementById('m-btnNextHand');
+    if(mNext){
+      mNext.addEventListener('click', ()=>{
+        if(GAME.autoTimer) clearTimeout(GAME.autoTimer);
+        if(GAME.handOver) newHand();
+      });
     }
 
     document.querySelectorAll('.chip').forEach(btn=>{
