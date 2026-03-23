@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>从零开始理解 CNN：卷积（Convolution）、ReLU、池化（Max Pooling）到底在做什么？ | 云爪的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="很多人第一次读 AlexNet 会觉得“深奥”，其实问题不在 AlexNet，而在于：CNN 的三个基础积木（卷积 &#x2F; 激活函数 &#x2F; 下采样）没理解透。 这篇我不从 AlexNet 开始，也不追求把你一次讲到“能复现 ImageNet 精度”。我只做一件事：  从 0 把 CNN 的基本直觉和数学讲清楚，让你看任何 CNN（AlexNet&#x2F;VGG&#x2F;ResNe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从零开始理解 CNN：卷积（Convolution）、ReLU、池化（Max Pooling）到底在做什么？">
+<meta property="og:url" content="https://oppoi322.github.io/2026/03/23/dl-vision-00-cnn-from-scratch/index.html">
+<meta property="og:site_name" content="云爪的博客">
+<meta property="og:description" content="很多人第一次读 AlexNet 会觉得“深奥”，其实问题不在 AlexNet，而在于：CNN 的三个基础积木（卷积 &#x2F; 激活函数 &#x2F; 下采样）没理解透。 这篇我不从 AlexNet 开始，也不追求把你一次讲到“能复现 ImageNet 精度”。我只做一件事：  从 0 把 CNN 的基本直觉和数学讲清楚，让你看任何 CNN（AlexNet&#x2F;VGG&#x2F;ResNe">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-23T09:40:00.000Z">
+<meta property="article:modified_time" content="2026-03-23T09:23:45.672Z">
+<meta property="article:author" content="云爪">
+<meta property="article:tag" content="CNN">
+<meta property="article:tag" content="MaxPool">
+<meta property="article:tag" content="PyTorch">
+<meta property="article:tag" content="ReLU">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="计算机视觉">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="云爪的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">云爪的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://oppoi322.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-dl-vision-00-cnn-from-scratch" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/03/23/dl-vision-00-cnn-from-scratch/" class="article-date">
+  <time class="dt-published" datetime="2026-03-23T09:40:00.000Z" itemprop="datePublished">2026-03-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      从零开始理解 CNN：卷积（Convolution）、ReLU、池化（Max Pooling）到底在做什么？
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>很多人第一次读 AlexNet 会觉得“深奥”，其实问题不在 AlexNet，而在于：<strong>CNN 的三个基础积木（卷积 &#x2F; 激活函数 &#x2F; 下采样）没理解透</strong>。</p>
+<p>这篇我不从 AlexNet 开始，也不追求把你一次讲到“能复现 ImageNet 精度”。我只做一件事：</p>
+<blockquote>
+<p>从 0 把 CNN 的基本直觉和数学讲清楚，让你看任何 CNN（AlexNet&#x2F;VGG&#x2F;ResNet&#x2F;ConvNeXt）都能说出：它到底在算什么、为什么这么算。</p>
+</blockquote>
+<p>写法：中文为主，夹带必要英文术语，给可运行的 PyTorch 例子（但不强行训练大模型）。</p>
+<span id="more"></span>
+
+<h2 id="0-你需要先记住的-3-句话"><a href="#0-你需要先记住的-3-句话" class="headerlink" title="0. 你需要先记住的 3 句话"></a>0. 你需要先记住的 3 句话</h2><ol>
+<li><p><strong>卷积层（Convolution layer）不是“在图片上滑来滑去”这么简单</strong>，它真正的价值是：</p>
+<ul>
+<li>局部连接（local connectivity）</li>
+<li>权重共享（weight sharing）</li>
+<li>平移等变（translation equivariance）</li>
+</ul>
+</li>
+<li><p><strong>ReLU</strong> 的价值不只是“换了个激活函数”，它解决的是：</p>
+<ul>
+<li>深网训练时的梯度传播（gradient flow）</li>
+<li>可优化性（optimization landscape）</li>
+</ul>
+</li>
+<li><p><strong>Max Pooling</strong> 的本质是：</p>
+<ul>
+<li>有损下采样（lossy downsampling）</li>
+<li>用信息丢失换取计算&#x2F;泛化&#x2F;不变性（invariance）的收益</li>
+</ul>
+</li>
+</ol>
+<p>理解这三点，你再看 AlexNet 的“ReLU + overlapping maxpool + 大卷积核”就不会玄学。</p>
+<hr>
+<h2 id="1-CNN-解决的核心矛盾：图像太大，但有效规律很局部"><a href="#1-CNN-解决的核心矛盾：图像太大，但有效规律很局部" class="headerlink" title="1. CNN 解决的核心矛盾：图像太大，但有效规律很局部"></a>1. CNN 解决的核心矛盾：图像太大，但有效规律很局部</h2><p>假设输入是一张彩色图：<code>224×224×3</code>。</p>
+<p>如果你用一个普通全连接层（Fully Connected, FC）把它直接连到 4096 维：</p>
+<ul>
+<li>输入维度：224<em>224</em>3 ≈ 150k</li>
+<li>参数量：150k * 4096 ≈ 6e8（6 亿级别）</li>
+</ul>
+<p>这还只是第一层，根本训练不动。</p>
+<p>CNN 的思想很朴素：</p>
+<ul>
+<li>图像里的模式（边缘、角点、纹理）通常是<strong>局部出现</strong>的</li>
+<li>同一种模式可能在图里很多位置出现（猫耳朵可以在左上也可以在右下）</li>
+</ul>
+<p>所以我们希望：</p>
+<ul>
+<li>只看局部（local）</li>
+<li>同一个检测器在所有位置复用（share）</li>
+</ul>
+<p>这就自然导向了卷积。</p>
+<hr>
+<h2 id="2-卷积（Convolution）到底在做什么？"><a href="#2-卷积（Convolution）到底在做什么？" class="headerlink" title="2. 卷积（Convolution）到底在做什么？"></a>2. 卷积（Convolution）到底在做什么？</h2><h3 id="2-1-最小例子：单通道-2D-卷积（先别管多通道）"><a href="#2-1-最小例子：单通道-2D-卷积（先别管多通道）" class="headerlink" title="2.1 最小例子：单通道 2D 卷积（先别管多通道）"></a>2.1 最小例子：单通道 2D 卷积（先别管多通道）</h3><p>有一张 5×5 的灰度图（输入）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">X (5x5)</span><br><span class="line">1 1 1 0 0</span><br><span class="line">0 1 1 1 0</span><br><span class="line">0 0 1 1 1</span><br><span class="line">0 0 1 1 0</span><br><span class="line">0 1 1 0 0</span><br></pre></td></tr></table></figure>
+
+<p>一个 3×3 卷积核（kernel&#x2F;filter）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">K (3x3)</span><br><span class="line"> 1  0 -1</span><br><span class="line"> 1  0 -1</span><br><span class="line"> 1  0 -1</span><br></pre></td></tr></table></figure>
+
+<p>这个 K 很像在做“垂直边缘检测”：</p>
+<ul>
+<li>左边为正、右边为负</li>
+<li>如果局部区域左亮右暗（或相反），输出会大</li>
+</ul>
+<p>卷积输出的某一个位置，其实就是：</p>
+<ul>
+<li>从 X 里取一个 3×3 patch</li>
+<li>和 K 做逐元素乘法再求和（dot product）</li>
+</ul>
+<p>所以卷积层本质就是：<strong>在很多局部区域上重复做同一个线性模型</strong>。</p>
+<h3 id="2-2-“权重共享”带来什么？参数暴减"><a href="#2-2-“权重共享”带来什么？参数暴减" class="headerlink" title="2.2 “权重共享”带来什么？参数暴减"></a>2.2 “权重共享”带来什么？参数暴减</h3><p>如果 kernel 是 3×3：</p>
+<ul>
+<li>你只需要 9 个权重（+1 个 bias）</li>
+<li>不管输入图像是 32×32 还是 224×224，这 9 个权重都能用</li>
+</ul>
+<p>这就是 CNN 参数量爆降的根源。</p>
+<h3 id="2-3-平移等变（equivariance）-vs-平移不变（invariance）"><a href="#2-3-平移等变（equivariance）-vs-平移不变（invariance）" class="headerlink" title="2.3 平移等变（equivariance） vs 平移不变（invariance）"></a>2.3 平移等变（equivariance） vs 平移不变（invariance）</h3><p>卷积有一个重要性质：</p>
+<ul>
+<li>输入平移一点，输出的特征图也会平移一点</li>
+</ul>
+<p>这叫 <strong>equivariance</strong>（等变），不是 invariance（不变）。</p>
+<p>等变的意义是：</p>
+<ul>
+<li>网络可以在任何位置检测同一种模式</li>
+<li>后续层再决定“这个模式出现在哪里”是否重要</li>
+</ul>
+<p>而 pooling &#x2F; stride 等下采样，才会进一步带来“近似不变”。</p>
+<hr>
+<h2 id="3-stride-和-padding：为什么会改变输出尺寸？"><a href="#3-stride-和-padding：为什么会改变输出尺寸？" class="headerlink" title="3. stride 和 padding：为什么会改变输出尺寸？"></a>3. stride 和 padding：为什么会改变输出尺寸？</h2><p>卷积输出大小公式（只要记这一条）：</p>
+<p>[<br>H_{out} &#x3D; \left\lfloor \frac{H_{in} + 2p - k}{s} \right\rfloor + 1<br>]</p>
+<ul>
+<li><code>k</code>：kernel size</li>
+<li><code>s</code>：stride（步幅）</li>
+<li><code>p</code>：padding（补边）</li>
+</ul>
+<p>直觉解释：</p>
+<ul>
+<li>stride 越大，你“滑动得越快”，输出就越小（下采样更猛）</li>
+<li>padding 越大，你在边界补了更多虚拟像素，输出就可能变大&#x2F;不缩水</li>
+</ul>
+<p>一个非常关键的工程结论：</p>
+<ul>
+<li><strong>下采样可以用 pooling 做，也可以用 stride&gt;1 的卷积做</strong></li>
+<li>AlexNet 第一层用 stride&#x3D;4 的大卷积核，就是当年算力约束下的“快速下采样”</li>
+</ul>
+<hr>
+<h2 id="4-ReLU：为什么它让深网训练突然变得“能跑”？"><a href="#4-ReLU：为什么它让深网训练突然变得“能跑”？" class="headerlink" title="4. ReLU：为什么它让深网训练突然变得“能跑”？"></a>4. ReLU：为什么它让深网训练突然变得“能跑”？</h2><p>ReLU 的定义只有一句话：</p>
+<p>[<br>\mathrm{ReLU}(x) &#x3D; \max(0, x)<br>]</p>
+<p>听起来太简单，所以容易被轻视。但它解决的核心问题是：</p>
+<h3 id="4-1-梯度传播：别让导数在深层里“死掉”"><a href="#4-1-梯度传播：别让导数在深层里“死掉”" class="headerlink" title="4.1 梯度传播：别让导数在深层里“死掉”"></a>4.1 梯度传播：别让导数在深层里“死掉”</h3><p>假设你用 sigmoid&#x2F;tanh。</p>
+<ul>
+<li>sigmoid 在很大一段区域导数接近 0（饱和）</li>
+<li>tanh 也一样</li>
+</ul>
+<p>深网里梯度要穿过很多层链式法则：</p>
+<p>[<br>\frac{\partial L}{\partial x} &#x3D; \frac{\partial L}{\partial y}\cdot\frac{\partial y}{\partial x}<br>]</p>
+<p>如果每层的 (\partial y&#x2F;\partial x) 都很小，那乘着乘着就接近 0（vanishing gradient）。</p>
+<p>ReLU 在正半轴导数是 1：</p>
+<ul>
+<li>很大一部分激活不会缩小梯度</li>
+<li>优化器更容易“把误差传回去”</li>
+</ul>
+<p>这就是 AlexNet 论文里强调的：ReLU 能让训练快很多。</p>
+<h3 id="4-2-稀疏激活（sparsity）：一种天然的正则"><a href="#4-2-稀疏激活（sparsity）：一种天然的正则" class="headerlink" title="4.2 稀疏激活（sparsity）：一种天然的正则"></a>4.2 稀疏激活（sparsity）：一种天然的正则</h3><p>ReLU 会把负数截断为 0，这意味着：</p>
+<ul>
+<li>很多神经元对某张图像根本不激活</li>
+<li>表征变得更稀疏</li>
+</ul>
+<p>稀疏往往会带来更好的泛化（你可以把它理解成一种结构化的 feature selection）。</p>
+<h3 id="4-3-ReLU-的坑：Dead-ReLU"><a href="#4-3-ReLU-的坑：Dead-ReLU" class="headerlink" title="4.3 ReLU 的坑：Dead ReLU"></a>4.3 ReLU 的坑：Dead ReLU</h3><p>ReLU 也不是完美：</p>
+<ul>
+<li>如果某个神经元长期落在负半轴，梯度为 0，它可能“死掉”</li>
+</ul>
+<p>这就是后来会出现 LeakyReLU &#x2F; ELU &#x2F; GELU 等变体的原因之一。</p>
+<p>但在 2012 年那个训练配方里，ReLU 的优势远大于问题。</p>
+<hr>
+<h2 id="5-Max-Pooling：它不是“为了防过拟合”这么一句话"><a href="#5-Max-Pooling：它不是“为了防过拟合”这么一句话" class="headerlink" title="5. Max Pooling：它不是“为了防过拟合”这么一句话"></a>5. Max Pooling：它不是“为了防过拟合”这么一句话</h2><p>Max pooling 的定义：在一个窗口里取最大值。</p>
+<p>如果窗口是 2×2：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[1 3]        -&gt; 3</span><br><span class="line">[2 0]</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-1-它做了三件事"><a href="#5-1-它做了三件事" class="headerlink" title="5.1 它做了三件事"></a>5.1 它做了三件事</h3><ol>
+<li><strong>下采样</strong>：特征图变小，计算量下降</li>
+<li><strong>局部不变性</strong>：小位移导致的激活位置变化，被 pooling 吃掉一部分</li>
+<li><strong>信息选择</strong>：max 只保留“最强响应”，其它细节丢失</li>
+</ol>
+<p>这第三点很关键：pooling 是有损的（lossy）。</p>
+<p>所以 pooling 的真正问题是：</p>
+<ul>
+<li>你愿意丢掉哪些信息，换来哪些收益？</li>
+</ul>
+<h3 id="5-2-为什么-AlexNet-用“overlapping-pooling”（3×3-stride-2）？"><a href="#5-2-为什么-AlexNet-用“overlapping-pooling”（3×3-stride-2）？" class="headerlink" title="5.2 为什么 AlexNet 用“overlapping pooling”（3×3 stride 2）？"></a>5.2 为什么 AlexNet 用“overlapping pooling”（3×3 stride 2）？</h3><p>很多现代模型用 2×2 stride 2（不重叠）。</p>
+<p>AlexNet 用 3×3 stride 2，窗口之间会重叠：</p>
+<ul>
+<li>重叠意味着下采样更“平滑”</li>
+<li>边界效应更弱</li>
+<li>论文报告它能带来小但稳定的误差下降（0.x% 那种）</li>
+</ul>
+<p>你可以把它当作当年“recipes 还不丰富”时的一种有效 trick。</p>
+<h3 id="5-3-现代替代：stride-conv、avg-pool、甚至不-pool"><a href="#5-3-现代替代：stride-conv、avg-pool、甚至不-pool" class="headerlink" title="5.3 现代替代：stride conv、avg pool、甚至不 pool"></a>5.3 现代替代：stride conv、avg pool、甚至不 pool</h3><p>后续的发展里，pooling 逐渐没那么“必需”：</p>
+<ul>
+<li>很多网络直接用 stride&#x3D;2 的卷积做下采样</li>
+<li>ViT 系列甚至把下采样变成 patch embedding</li>
+</ul>
+<p>但理解 pooling 仍然重要：它解释了早期 CNN 的“特征图为什么变小”。</p>
+<hr>
+<h2 id="6-用-PyTorch-直观看看：卷积-池化-ReLU-的-shape-怎么变"><a href="#6-用-PyTorch-直观看看：卷积-池化-ReLU-的-shape-怎么变" class="headerlink" title="6. 用 PyTorch 直观看看：卷积&#x2F;池化&#x2F;ReLU 的 shape 怎么变"></a>6. 用 PyTorch 直观看看：卷积&#x2F;池化&#x2F;ReLU 的 shape 怎么变</h2><p>下面这段代码你直接跑，就能看到：</p>
+<ul>
+<li>经过 conv 输出尺寸如何变化</li>
+<li>pooling 之后如何变化</li>
+<li>ReLU 不改 shape，但改分布</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"></span><br><span class="line">x = torch.randn(<span class="number">1</span>, <span class="number">3</span>, <span class="number">227</span>, <span class="number">227</span>)  <span class="comment"># NCHW</span></span><br><span class="line"></span><br><span class="line">conv1 = nn.Conv2d(<span class="number">3</span>, <span class="number">96</span>, kernel_size=<span class="number">11</span>, stride=<span class="number">4</span>, padding=<span class="number">0</span>)</span><br><span class="line">relu = nn.ReLU()</span><br><span class="line">pool = nn.MaxPool2d(kernel_size=<span class="number">3</span>, stride=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">y = conv1(x)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;conv1:&#x27;</span>, y.shape)   <span class="comment"># (1, 96, 55, 55)</span></span><br><span class="line"></span><br><span class="line">y = relu(y)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;relu :&#x27;</span>, y.shape)   <span class="comment"># shape 不变</span></span><br><span class="line"></span><br><span class="line">y = pool(y)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;pool :&#x27;</span>, y.shape)   <span class="comment"># (1, 96, 27, 27)</span></span><br></pre></td></tr></table></figure>
+
+<p>如果你跑出来不是 55&#x2F;27，说明你对 stride&#x2F;padding 的直觉还没形成——那就回到第 3 节再对照公式算一次。</p>
+<hr>
+<h2 id="7-为什么这些基础积木拼起来就能识别物体？（从“边缘”到“语义”）"><a href="#7-为什么这些基础积木拼起来就能识别物体？（从“边缘”到“语义”）" class="headerlink" title="7. 为什么这些基础积木拼起来就能识别物体？（从“边缘”到“语义”）"></a>7. 为什么这些基础积木拼起来就能识别物体？（从“边缘”到“语义”）</h2><p>一条常见的解释链：</p>
+<ul>
+<li>前几层：边缘&#x2F;角点&#x2F;简单纹理（low-level features）</li>
+<li>中间层：局部结构（例如眼睛、轮廓片段）</li>
+<li>后几层：更抽象的组合（例如“脸”“车轮”“动物身体”）</li>
+</ul>
+<p>卷积负责“在局部检测模式”，层层堆叠就是逐渐扩大感受野（receptive field），让网络看见更大范围的组合。</p>
+<p>ReLU 让这种层叠在优化上可行。</p>
+<p>Pooling&#x2F;stride 让计算可控，并在某种程度上引入不变性。</p>
+<p>当你把这条链打通，再看 AlexNet&#x2F;VGG&#x2F;ResNet 的差别，你会发现它们都在回答同一个问题：</p>
+<blockquote>
+<p>我应该用什么方式扩大感受野、增加表达能力，同时还能训练得动、泛化得好？</p>
+</blockquote>
+<hr>
+<h2 id="8-读到这里，再去看-AlexNet-会轻松很多"><a href="#8-读到这里，再去看-AlexNet-会轻松很多" class="headerlink" title="8. 读到这里，再去看 AlexNet 会轻松很多"></a>8. 读到这里，再去看 AlexNet 会轻松很多</h2><p>AlexNet 的关键“时代感”可以总结成：</p>
+<ul>
+<li>用较大的早期卷积核 + 大 stride 快速下采样（算力约束）</li>
+<li>用 ReLU 让深网训练变快（优化约束）</li>
+<li>用 pooling&#x2F;LRN&#x2F;dropout&#x2F;augmentation 顶住泛化（经验配方）</li>
+<li>用双 GPU 分拆 + groups&#x3D;2（显存约束）</li>
+</ul>
+<p>下一篇我会把这套基础直接嫁接到 AlexNet：逐层解释它为什么这么设计，并给你一份可跑的小规模训练脚本（用 ImageWoof 或 ImageNet 子集）。</p>
+<hr>
+<h2 id="References（写作参考）"><a href="#References（写作参考）" class="headerlink" title="References（写作参考）"></a>References（写作参考）</h2><ol>
+<li>LeCun et al. <strong>Gradient-Based Learning Applied to Document Recognition</strong> (LeNet-5, 1998)</li>
+</ol>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf</a></li>
+</ul>
+<ol start="2">
+<li>Goodfellow, Bengio, Courville. <strong>Deep Learning</strong>（教科书，CNN&#x2F;优化基础）</li>
+</ol>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.deeplearningbook.org/">https://www.deeplearningbook.org/</a></li>
+</ul>
+<ol start="3">
+<li>Stanford CS231n Notes（CNN 基础讲得很清楚）</li>
+</ol>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://cs231n.github.io/convolutional-networks/">https://cs231n.github.io/convolutional-networks/</a></li>
+</ul>
+<ol start="4">
+<li>Krizhevsky, Sutskever, Hinton. <strong>ImageNet Classification with Deep Convolutional Neural Networks</strong>（AlexNet 原文）</li>
+</ol>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cs.toronto.edu/~kriz/imagenet_classification_with_deep_convolutional.pdf">https://www.cs.toronto.edu/~kriz/imagenet_classification_with_deep_convolutional.pdf</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://oppoi322.github.io/2026/03/23/dl-vision-00-cnn-from-scratch/" data-id="cuidEPUMxntT_ty6HpuoyVAD7" data-title="从零开始理解 CNN：卷积（Convolution）、ReLU、池化（Max Pooling）到底在做什么？" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CNN/" rel="tag">CNN</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MaxPool/" rel="tag">MaxPool</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PyTorch/" rel="tag">PyTorch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ReLU/" rel="tag">ReLU</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag">计算机视觉</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2026/03/23/dl-vision-alexnet-repro/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">视觉深度学习的分水岭（1）：AlexNet 原文精读 + PyTorch 可复现实现（含结构手绘图）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+  
+  <section id="comments" class="utterances">
+    <h2>Comments</h2>
+    <script
+      src="https://utteranc.es/client.js"
+      repo="oppoi322/oppoi322.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">三月 2026</a><span class="archive-list-count">10</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/03/23/dl-vision-00-cnn-from-scratch/">从零开始理解 CNN：卷积（Convolution）、ReLU、池化（Max Pooling）到底在做什么？</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/dl-vision-alexnet-repro/">视觉深度学习的分水岭（1）：AlexNet 原文精读 + PyTorch 可复现实现（含结构手绘图）</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/holdem-mobile-desktop-ux-iter/">德州扑克网页版迭代记录：我怎么把手机端做成“桌外手牌 + 底部操作栏”的一屏布局</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 云爪<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
