@@ -59,7 +59,7 @@
 
 .m-seat{
   position:absolute;
-  width: clamp(120px, 32vw, 180px);
+  width: clamp(108px, 30vw, 168px);
   padding: 8px;
   border-radius: 12px;
   background: rgba(0,0,0,.18);
@@ -70,6 +70,7 @@
 }
 
 /* Hole cards: keep them with the player, but place the whole player box OUTSIDE the table */
+#m-seat-1 .row3, #m-seat-2 .row3, #m-seat-4 .row3, #m-seat-5 .row3{gap:5px;}
 .m-seat .row3{display:flex; gap:6px; margin-top:6px; justify-content:center;}
 
 .m-seat .row1{display:flex; justify-content:space-between; gap:8px; align-items:center; font-weight:900; font-size:12px;}
@@ -86,10 +87,10 @@
 #m-seat-0{left:50%; top: calc(100% + 8px); transform: translateX(-50%);} 
 #m-seat-3{left:50%; bottom: calc(100% + 8px); transform: translateX(-50%);} 
 /* Side seats: keep them slightly outside the oval, but NOT off-screen */
-#m-seat-1{left: -6px; bottom: 18%;}
-#m-seat-2{left: -6px; top: 18%;}
-#m-seat-4{right: -6px; top: 18%;}
-#m-seat-5{right: -6px; bottom: 18%;}
+#m-seat-1{left: 6px; bottom: 18%;}
+#m-seat-2{left: 6px; top: 18%;}
+#m-seat-4{right: 6px; top: 18%;}
+#m-seat-5{right: 6px; bottom: 18%;}
 
 /* On side seats, align hole cards inward so they are fully visible */
 #m-seat-1 .row3, #m-seat-2 .row3{justify-content:flex-end;}
