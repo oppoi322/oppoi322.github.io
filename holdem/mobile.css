@@ -7,6 +7,10 @@
   --m-card-w: clamp(24px, 6.6vw, 32px);
   --m-card-h: calc(var(--m-card-w) * 1.35);
 
+  /* Seat box width (used to carve horizontal space for side players) */
+  --m-seat-w: clamp(100px, 28vw, 156px);
+  --m-side-gap: 10px;
+
   /* vertical room for top/bottom outside seats */
   --m-out-y: clamp(54px, 9vw, 80px);
 
@@ -19,7 +23,8 @@
 .mobile-table .card.small{width: calc(var(--m-card-w) * .92); height: calc(var(--m-card-h) * .92); font-size:12px;}
 
 .oval{
-  width: 100%;
+  width: calc(100% - (var(--m-seat-w) * 2) - (var(--m-side-gap) * 2));
+  margin: 0 auto;
   /* Smaller table so there is room for cards outside */
   /* Slightly smaller table to ensure room for outside cards */
   height: min(42vh, 330px);
@@ -61,7 +66,7 @@
 
 .m-seat{
   position:absolute;
-  width: clamp(100px, 28vw, 156px);
+  width: var(--m-seat-w);
   padding: 8px;
   border-radius: 12px;
   background: rgba(0,0,0,.18);
@@ -90,10 +95,10 @@
 #m-seat-3{left:50%; bottom: calc(100% + 6px); transform: translateX(-50%);} 
 
 /* Side seats: outside the oval (not on the table) */
-#m-seat-1{right: calc(100% + 6px); bottom: 20%;}
-#m-seat-2{right: calc(100% + 6px); top: 20%;}
-#m-seat-4{left: calc(100% + 6px); top: 20%;}
-#m-seat-5{left: calc(100% + 6px); bottom: 20%;}
+#m-seat-1{right: calc(100% + var(--m-side-gap)); bottom: 20%;}
+#m-seat-2{right: calc(100% + var(--m-side-gap)); top: 20%;}
+#m-seat-4{left: calc(100% + var(--m-side-gap)); top: 20%;}
+#m-seat-5{left: calc(100% + var(--m-side-gap)); bottom: 20%;}
 
 /* Keep side hole cards fully visible by aligning inward */
 #m-seat-1 .row3, #m-seat-2 .row3{justify-content:flex-start;}
