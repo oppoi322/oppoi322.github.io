@@ -288,6 +288,7 @@
   function setNextCountdown(ms){
     const el = document.getElementById('m-nextCountdown');
     if(!el) return;
+    if(ms===-1){ el.textContent='下一局 ∞'; return; }
     if(ms<=0){ el.textContent=''; return; }
     el.textContent = `下一局 ${Math.ceil(ms/1000)}s`;
   }
@@ -299,7 +300,7 @@
     const sel = document.getElementById('m-nextDelay');
     if(sel){
       const v = Number(sel.value);
-      if(!Number.isNaN(v) && v>=0) GAME.autoNextDelayMs = v;
+      if(!Number.isNaN(v)) GAME.autoNextDelayMs = v;
     }
 
     // If someone is busted and only one player has chips, don't loop forever.
@@ -311,6 +312,13 @@
 
     if(GAME.autoTimer) clearTimeout(GAME.autoTimer);
     if(GAME.countdownTimer) clearInterval(GAME.countdownTimer);
+
+    // Manual mode: show infinity countdown, do not auto-advance.
+    if(GAME.autoNextDelayMs === -1){
+      GAME.autoDueAt = null;
+      setNextCountdown(-1);
+      return;
+    }
 
     GAME.autoDueAt = Date.now() + GAME.autoNextDelayMs;
     setNextCountdown(GAME.autoNextDelayMs);
@@ -1031,13 +1039,20 @@
     if(mDelay){
       mDelay.addEventListener('change', ()=>{
         const v = Number(mDelay.value);
-        if(!Number.isNaN(v) && v>=0) GAME.autoNextDelayMs = v;
+        if(!Number.isNaN(v)) GAME.autoNextDelayMs = v;
+        // If hand is already over, re-arm countdown with the new mode.
+        if(GAME.handOver) scheduleAutoNextHand();
       });
     }
     const mNext = document.getElementById('m-btnNextHand');
     if(mNext){
       mNext.addEventListener('click', ()=>{
         if(GAME.autoTimer) clearTimeout(GAME.autoTimer);
+        if(GAME.countdownTimer) clearInterval(GAME.countdownTimer);
+        GAME.autoTimer=null;
+        GAME.countdownTimer=null;
+        GAME.autoDueAt=null;
+        setNextCountdown(0);
         if(GAME.handOver) newHand();
       });
     }
