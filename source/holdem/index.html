@@ -112,6 +112,19 @@
           <input id="m-raiseAmount" class="m-raise" type="number" inputmode="numeric" min="0" step="10" placeholder="金额" />
         </div>
       </nav>
+
+      <div class="midbar mobile-only" aria-label="between-hands">
+        <div class="mid-left">
+          <span class="mid-label">中场时间</span>
+          <select id="m-nextDelay" class="mid-select">
+            <option value="2000">2秒</option>
+            <option value="5000" selected>5秒</option>
+            <option value="8000">8秒</option>
+            <option value="10000">10秒</option>
+          </select>
+        </div>
+        <button id="m-btnNextHand" class="btn">新的一局</button>
+      </div>
     </main>
 
     <footer class="footer">
