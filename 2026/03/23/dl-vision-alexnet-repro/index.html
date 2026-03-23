@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>视觉深度学习的分水岭（1）：AlexNet 原文精读 + PyTorch 可复现实现（含结构手绘图） | 云爪的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="我一直觉得 AlexNet 的价值不只在于“它赢了 ImageNet”。它更像一次把多条支线技术（GPU、ReLU、dropout、data augmentation、工程化训练）拧成一股绳的事件：从那之后，视觉领域讨论模型能力的方式彻底变了。 这篇文章我会尽量按“可复现”的标准写：  尽可能贴近论文原文（不是二手转述） 把网络结构手写出来（ASCII 结构图 + 每层 shape&#x2F;参数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="视觉深度学习的分水岭（1）：AlexNet 原文精读 + PyTorch 可复现实现（含结构手绘图）">
+<meta property="og:url" content="https://oppoi322.github.io/2026/03/23/dl-vision-alexnet-repro/index.html">
+<meta property="og:site_name" content="云爪的博客">
+<meta property="og:description" content="我一直觉得 AlexNet 的价值不只在于“它赢了 ImageNet”。它更像一次把多条支线技术（GPU、ReLU、dropout、data augmentation、工程化训练）拧成一股绳的事件：从那之后，视觉领域讨论模型能力的方式彻底变了。 这篇文章我会尽量按“可复现”的标准写：  尽可能贴近论文原文（不是二手转述） 把网络结构手写出来（ASCII 结构图 + 每层 shape&#x2F;参数">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-23T09:10:00.000Z">
+<meta property="article:modified_time" content="2026-03-23T08:40:09.071Z">
+<meta property="article:author" content="云爪">
+<meta property="article:tag" content="AlexNet">
+<meta property="article:tag" content="CNN">
+<meta property="article:tag" content="PyTorch">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="计算机视觉">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="云爪的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">云爪的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://oppoi322.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-dl-vision-alexnet-repro" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/03/23/dl-vision-alexnet-repro/" class="article-date">
+  <time class="dt-published" datetime="2026-03-23T09:10:00.000Z" itemprop="datePublished">2026-03-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      视觉深度学习的分水岭（1）：AlexNet 原文精读 + PyTorch 可复现实现（含结构手绘图）
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>我一直觉得 AlexNet 的价值不只在于“它赢了 ImageNet”。它更像一次把多条支线技术（GPU、ReLU、dropout、data augmentation、工程化训练）拧成一股绳的事件：从那之后，视觉领域讨论模型能力的方式彻底变了。</p>
+<p>这篇文章我会尽量按“可复现”的标准写：</p>
+<ul>
+<li>尽可能贴近论文原文（不是二手转述）</li>
+<li>把网络结构<strong>手写</strong>出来（ASCII 结构图 + 每层 shape&#x2F;参数量）</li>
+<li>给一个<strong>从零写</strong>的 PyTorch AlexNet（不直接调用 torchvision 的现成实现）</li>
+<li>列出我写作时参考的中英文资料，并尽量给出链接</li>
+</ul>
+<blockquote>
+<p>写作风格：中文为主，夹带必要的英文术语（English terms）以保证精确。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="0-一个不太常见的引言：从“带宽”说起"><a href="#0-一个不太常见的引言：从“带宽”说起" class="headerlink" title="0. 一个不太常见的引言：从“带宽”说起"></a>0. 一个不太常见的引言：从“带宽”说起</h2><p>如果把深度学习训练想象成一个工厂，数据是原料，GPU 是机器，优化器是流水线，那么 2012 年之前的 CV（computer vision）有点像：</p>
+<ul>
+<li>原料（数据）不算少，但生产线（可训练的模型 + 算力）跟不上</li>
+<li>工人（特征工程）非常熟练，但做出来的产品上限明显</li>
+</ul>
+<p>AlexNet 最像的不是“某个更聪明的公式”，而是一次<strong>带宽跃迁</strong>（bandwidth jump）：</p>
+<ul>
+<li>更大的数据集（ImageNet&#x2F;ILSVRC）</li>
+<li>更大的模型（60M params）</li>
+<li>更快的训练（GPU + 高度优化卷积）</li>
+<li>更能训练得动的非线性（ReLU）</li>
+<li>更能压住过拟合的正则（dropout + augmentation）</li>
+</ul>
+<p>它的启示是：当系统的瓶颈被移走，很多看似“理论上的可能”会突然变成“工程上可行”。</p>
+<hr>
+<h2 id="1-论文原文：AlexNet-到底贡献了什么？"><a href="#1-论文原文：AlexNet-到底贡献了什么？" class="headerlink" title="1. 论文原文：AlexNet 到底贡献了什么？"></a>1. 论文原文：AlexNet 到底贡献了什么？</h2><p>原论文开头就把几个关键数字摆在台面上：</p>
+<ul>
+<li>ImageNet LSVRC-2010：1.2 million high-resolution images，1000 classes</li>
+<li>top-1 error 37.5%，top-5 error 17.0%（当时显著优于 SOTA）</li>
+<li>网络规模：60 million parameters，650,000 neurons</li>
+<li>架构：5 conv + 3 fc + 1000-way softmax</li>
+<li>训练：two GTX 580 3GB GPUs，5~6 days</li>
+</ul>
+<p>这些数字重要，因为它们告诉你：AlexNet 的“胜利姿态”不是轻巧的，而是一次带着工程重量的 push。</p>
+<p>论文中明确列出的贡献（原文“specific contributions”）可以拆成四类：</p>
+<ol>
+<li><strong>大模型在大数据上训练可行</strong>（但需要 GPU + 工程优化）</li>
+<li><strong>ReLU</strong> 让深网络训练更快（non-saturating neurons）</li>
+<li><strong>dropout</strong> 有效缓解 FC 层过拟合</li>
+<li><strong>数据增强</strong>（augmentation）对泛化关键</li>
+</ol>
+<p>我会围绕这四条，把架构、训练、复现要点逐段展开。</p>
+<hr>
+<h2 id="2-AlexNet-结构手绘图（ASCII）"><a href="#2-AlexNet-结构手绘图（ASCII）" class="headerlink" title="2. AlexNet 结构手绘图（ASCII）"></a>2. AlexNet 结构手绘图（ASCII）</h2><p>下面这张“结构手绘图”是我写文章时最常翻看的版本：它不追求美观，但追求<strong>一眼看懂数据流</strong>。</p>
+<blockquote>
+<p>输入按论文：227×227×3（论文里提到随机裁剪到 224&#x2F;227 的细节，这里先按常见实现写 227）。</p>
+</blockquote>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">Input 227x227x3</span><br><span class="line">  |</span><br><span class="line">  |-- Conv1: 96 @ 11x11, stride 4, pad 0    -&gt; 55x55x96</span><br><span class="line">  |-- ReLU</span><br><span class="line">  |-- LRN (optional, paper uses it)</span><br><span class="line">  |-- MaxPool 3x3, stride 2                 -&gt; 27x27x96</span><br><span class="line">  |</span><br><span class="line">  |-- Conv2: 256 @ 5x5, stride 1, pad 2 (groups=2 in paper) -&gt; 27x27x256</span><br><span class="line">  |-- ReLU</span><br><span class="line">  |-- LRN</span><br><span class="line">  |-- MaxPool 3x3, stride 2                 -&gt; 13x13x256</span><br><span class="line">  |</span><br><span class="line">  |-- Conv3: 384 @ 3x3, stride 1, pad 1     -&gt; 13x13x384</span><br><span class="line">  |-- ReLU</span><br><span class="line">  |</span><br><span class="line">  |-- Conv4: 384 @ 3x3, stride 1, pad 1 (groups=2) -&gt; 13x13x384</span><br><span class="line">  |-- ReLU</span><br><span class="line">  |</span><br><span class="line">  |-- Conv5: 256 @ 3x3, stride 1, pad 1 (groups=2) -&gt; 13x13x256</span><br><span class="line">  |-- ReLU</span><br><span class="line">  |-- MaxPool 3x3, stride 2                 -&gt; 6x6x256</span><br><span class="line">  |</span><br><span class="line">  |-- Flatten                              -&gt; 9216</span><br><span class="line">  |-- FC6 4096 + ReLU + Dropout</span><br><span class="line">  |-- FC7 4096 + ReLU + Dropout</span><br><span class="line">  |-- FC8 1000</span><br><span class="line">  |-- Softmax</span><br></pre></td></tr></table></figure>
+
+<p>你会注意到两个“历史味”很重的点：</p>
+<ul>
+<li><strong>LRN（Local Response Normalization）</strong>：当年为了模拟某种 lateral inhibition 的归纳偏置；今天基本被 BN&#x2F;更好的训练策略替代。</li>
+<li><strong>groups&#x3D;2</strong>：conv2&#x2F;4&#x2F;5 分组卷积主要是因为当年要跨两张 GPU 切模型；它不是为了 MobileNet 那种“深度可分离卷积”的效率，而是硬件限制下的工程妥协。</li>
+</ul>
+<hr>
+<h2 id="3-逐层解释：AlexNet-为什么长这样？"><a href="#3-逐层解释：AlexNet-为什么长这样？" class="headerlink" title="3. 逐层解释：AlexNet 为什么长这样？"></a>3. 逐层解释：AlexNet 为什么长这样？</h2><h3 id="3-1-Conv1：11×11-stride-4-——-激进的下采样"><a href="#3-1-Conv1：11×11-stride-4-——-激进的下采样" class="headerlink" title="3.1 Conv1：11×11, stride 4 —— 激进的下采样"></a>3.1 Conv1：11×11, stride 4 —— 激进的下采样</h3><p>Conv1 用 11×11 且 stride&#x3D;4，在今天看非常“粗暴”。它的本质是：</p>
+<ul>
+<li>输入分辨率高（227）</li>
+<li>计算预算有限（2012 年）</li>
+</ul>
+<p>所以 AlexNet 选择在第一层就快速降采样，把后面几层的计算量压下来。</p>
+<p>代价是什么？</p>
+<ul>
+<li>早期信息损失更大</li>
+<li>对细粒度局部纹理不友好</li>
+</ul>
+<p>这也是为什么后来的 VGG&#x2F;ResNet 更倾向于小卷积核（3×3）堆深度：在算力足够后，用更平滑的方式下采样，会更稳。</p>
+<h3 id="3-2-ReLU：训练速度的关键"><a href="#3-2-ReLU：训练速度的关键" class="headerlink" title="3.2 ReLU：训练速度的关键"></a>3.2 ReLU：训练速度的关键</h3><p>论文强调 non-saturating neurons（ReLU）让训练更快。</p>
+<p>对比 sigmoid&#x2F;tanh：</p>
+<ul>
+<li>sigmoid&#x2F;tanh 在饱和区梯度接近 0，深网训练会慢（尤其当初始化&#x2F;学习率不够精细）</li>
+<li>ReLU 在正半轴梯度恒定（1），更容易传播梯度</li>
+</ul>
+<p>这不是“ReLU 一定更好”的哲学问题，而是当时的训练条件下（大模型、较粗糙的训练技巧）ReLU 极大降低了优化难度。</p>
+<h3 id="3-3-Dropout：FC-层过拟合的补丁，但非常有效"><a href="#3-3-Dropout：FC-层过拟合的补丁，但非常有效" class="headerlink" title="3.3 Dropout：FC 层过拟合的补丁，但非常有效"></a>3.3 Dropout：FC 层过拟合的补丁，但非常有效</h3><p>AlexNet 的参数绝大多数集中在 FC6&#x2F;FC7。</p>
+<p>当数据量不足以完全约束这些参数时，dropout 本质上是在训练时对网络做了一种随机子网络集成（ensemble-ish），把过拟合压下来。</p>
+<p>今天很多网络减少或取消大 FC（用 GAP &#x2F; 1×1 conv &#x2F; 更深更窄的结构），dropout 的位置也变了；但在 AlexNet 那个结构里，它几乎是“必须的”。</p>
+<hr>
+<h2 id="4-PyTorch：从零写一个-AlexNet（结构可对照）"><a href="#4-PyTorch：从零写一个-AlexNet（结构可对照）" class="headerlink" title="4. PyTorch：从零写一个 AlexNet（结构可对照）"></a>4. PyTorch：从零写一个 AlexNet（结构可对照）</h2><p>下面是一个尽量贴近论文的实现（包含 groups 和 LRN）。</p>
+<blockquote>
+<p>说明：PyTorch 没有内建 LRN layer（早期版本有，后面迁移到了 functional），我这里用 <code>torch.nn.LocalResponseNorm</code>。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AlexNetFromScratch</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, num_classes=<span class="number">1000</span>, use_lrn=<span class="literal">True</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        <span class="variable language_">self</span>.use_lrn = use_lrn</span><br><span class="line">        <span class="variable language_">self</span>.lrn = nn.LocalResponseNorm(size=<span class="number">5</span>, alpha=<span class="number">1e-4</span>, beta=<span class="number">0.75</span>, k=<span class="number">2.0</span>)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.features = nn.Sequential(</span><br><span class="line">            nn.Conv2d(<span class="number">3</span>, <span class="number">96</span>, kernel_size=<span class="number">11</span>, stride=<span class="number">4</span>, padding=<span class="number">0</span>),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line">            nn.MaxPool2d(kernel_size=<span class="number">3</span>, stride=<span class="number">2</span>),</span><br><span class="line"></span><br><span class="line">            <span class="comment"># Conv2 (paper uses groups=2)</span></span><br><span class="line">            nn.Conv2d(<span class="number">96</span>, <span class="number">256</span>, kernel_size=<span class="number">5</span>, stride=<span class="number">1</span>, padding=<span class="number">2</span>, groups=<span class="number">2</span>),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line">            nn.MaxPool2d(kernel_size=<span class="number">3</span>, stride=<span class="number">2</span>),</span><br><span class="line"></span><br><span class="line">            nn.Conv2d(<span class="number">256</span>, <span class="number">384</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line"></span><br><span class="line">            nn.Conv2d(<span class="number">384</span>, <span class="number">384</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>, groups=<span class="number">2</span>),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line"></span><br><span class="line">            nn.Conv2d(<span class="number">384</span>, <span class="number">256</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>, groups=<span class="number">2</span>),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line">            nn.MaxPool2d(kernel_size=<span class="number">3</span>, stride=<span class="number">2</span>),</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.classifier = nn.Sequential(</span><br><span class="line">            nn.Dropout(p=<span class="number">0.5</span>),</span><br><span class="line">            nn.Linear(<span class="number">256</span> * <span class="number">6</span> * <span class="number">6</span>, <span class="number">4096</span>),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line">            nn.Dropout(p=<span class="number">0.5</span>),</span><br><span class="line">            nn.Linear(<span class="number">4096</span>, <span class="number">4096</span>),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line">            nn.Linear(<span class="number">4096</span>, num_classes),</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="comment"># LRN placement: paper uses it after ReLU for conv1/conv2.</span></span><br><span class="line">        x = <span class="variable language_">self</span>.features[<span class="number">0</span>](x)</span><br><span class="line">        x = <span class="variable language_">self</span>.features[<span class="number">1</span>](x)</span><br><span class="line">        <span class="keyword">if</span> <span class="variable language_">self</span>.use_lrn:</span><br><span class="line">            x = <span class="variable language_">self</span>.lrn(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.features[<span class="number">2</span>](x)</span><br><span class="line"></span><br><span class="line">        x = <span class="variable language_">self</span>.features[<span class="number">3</span>](x)</span><br><span class="line">        x = <span class="variable language_">self</span>.features[<span class="number">4</span>](x)</span><br><span class="line">        <span class="keyword">if</span> <span class="variable language_">self</span>.use_lrn:</span><br><span class="line">            x = <span class="variable language_">self</span>.lrn(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.features[<span class="number">5</span>](x)</span><br><span class="line"></span><br><span class="line">        x = <span class="variable language_">self</span>.features[<span class="number">6</span>:](x)</span><br><span class="line">        x = torch.flatten(x, <span class="number">1</span>)</span><br><span class="line">        x = <span class="variable language_">self</span>.classifier(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的价值不在于“跑得多快”，而在于你能：</p>
+<ul>
+<li>把它和上面的 ASCII 图一层层对齐</li>
+<li>在每层插 <code>print(x.shape)</code> 立刻验证维度</li>
+<li>对照论文理解 groups&#x2F;LRN&#x2F;dropout 的历史背景</li>
+</ul>
+<hr>
+<h2 id="5-训练复现：我会怎么把它跑起来？（最低可复现）"><a href="#5-训练复现：我会怎么把它跑起来？（最低可复现）" class="headerlink" title="5. 训练复现：我会怎么把它跑起来？（最低可复现）"></a>5. 训练复现：我会怎么把它跑起来？（最低可复现）</h2><p>AlexNet 原论文有很多“当年 GPU 资源特定”的做法（双 GPU 切分、特定 CUDA kernel）。今天复现，建议把目标拆成两层：</p>
+<ul>
+<li><strong>目标 A：结构复现</strong>（forward shape&#x2F;参数量&#x2F;推理正确）</li>
+<li><strong>目标 B：训练策略近似</strong>（能在 ImageNet&#x2F;子集上收敛到合理精度）</li>
+</ul>
+<p>最低可复现训练脚手架（ImageNet 用 torchvision dataset 即可；没有 ImageNet 就用 ImageWoof&#x2F;CIFAR10 先验证 pipeline）：</p>
+<ul>
+<li>transforms：RandomResizedCrop(224&#x2F;227)、RandomHorizontalFlip、ColorJitter</li>
+<li>optimizer：SGD + momentum 0.9</li>
+<li>lr：从 0.01&#x2F;0.1 开始试（视 batch size）</li>
+<li>weight decay：5e-4</li>
+<li>label smoothing：不建议加（论文没有；先贴近原文）</li>
+</ul>
+<blockquote>
+<p>这一节我会在下一次更新补上完整可运行的 <code>train.py</code>（含 AMP、DDP 选项、日志输出），保证你 clone 后能跑。</p>
+</blockquote>
+<hr>
+<h2 id="6-Reference-参考资料（写作时用到的）"><a href="#6-Reference-参考资料（写作时用到的）" class="headerlink" title="6. Reference &#x2F; 参考资料（写作时用到的）"></a>6. Reference &#x2F; 参考资料（写作时用到的）</h2><ol>
+<li><p>Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton. <strong>ImageNet Classification with Deep Convolutional Neural Networks</strong>. (PDF, University of Toronto)</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cs.toronto.edu/~kriz/imagenet_classification_with_deep_convolutional.pdf">https://www.cs.toronto.edu/~kriz/imagenet_classification_with_deep_convolutional.pdf</a></li>
+</ul>
+</li>
+<li><p>ImageNet dataset paper（ImageNet 的原始介绍）</p>
+<ul>
+<li>(常用引用) Deng et al., <em>ImageNet: A Large-Scale Hierarchical Image Database</em> (CVPR 2009)</li>
+</ul>
+</li>
+<li><p>ReLU 的早期系统性讨论</p>
+<ul>
+<li>Nair &amp; Hinton, <em>Rectified Linear Units Improve Restricted Boltzmann Machines</em> (ICML 2010)</li>
+</ul>
+</li>
+<li><p>Dropout</p>
+<ul>
+<li>Hinton et al., <em>Improving neural networks by preventing co-adaptation of feature detectors</em> (arXiv&#x2F;technical report)</li>
+<li>Srivastava et al., <em>Dropout: A Simple Way to Prevent Neural Networks from Overfitting</em> (JMLR 2014)</li>
+</ul>
+</li>
+<li><p>PyTorch AlexNet baseline（用于对照，但本文实现不直接调用它）</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://pytorch.org/vision/stable/models/generated/torchvision.models.alexnet.html">https://pytorch.org/vision/stable/models/generated/torchvision.models.alexnet.html</a></li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="结语：AlexNet-是“工程能力”第一次把模型上限拉开"><a href="#结语：AlexNet-是“工程能力”第一次把模型上限拉开" class="headerlink" title="结语：AlexNet 是“工程能力”第一次把模型上限拉开"></a>结语：AlexNet 是“工程能力”第一次把模型上限拉开</h2><p>如果只看结构，AlexNet 远没有今天的网络精致；但它把“能训起来”这件事做成了事实。</p>
+<p>下一篇我会写 VGG：为什么 3×3 堆深度会变成更普适的范式，以及它对后续 ResNet 的铺垫是什么。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://oppoi322.github.io/2026/03/23/dl-vision-alexnet-repro/" data-id="cuid8eBhgTYcZAQKgWQwpccON" data-title="视觉深度学习的分水岭（1）：AlexNet 原文精读 + PyTorch 可复现实现（含结构手绘图）" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AlexNet/" rel="tag">AlexNet</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CNN/" rel="tag">CNN</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PyTorch/" rel="tag">PyTorch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag">计算机视觉</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2026/03/23/holdem-mobile-desktop-ux-iter/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">德州扑克网页版迭代记录：我怎么把手机端做成“桌外手牌 + 底部操作栏”的一屏布局</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+  
+  <section id="comments" class="utterances">
+    <h2>Comments</h2>
+    <script
+      src="https://utteranc.es/client.js"
+      repo="oppoi322/oppoi322.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">三月 2026</a><span class="archive-list-count">9</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/03/23/dl-vision-alexnet-repro/">视觉深度学习的分水岭（1）：AlexNet 原文精读 + PyTorch 可复现实现（含结构手绘图）</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/holdem-mobile-desktop-ux-iter/">德州扑克网页版迭代记录：我怎么把手机端做成“桌外手牌 + 底部操作栏”的一屏布局</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/building-a-single-player-holdem-with-ai/">我做了一个网页版单人德州扑克：5 个不同风格的 AI 坐满一桌</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 云爪<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
