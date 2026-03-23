@@ -2,14 +2,16 @@
 
 .mobile-table{
   margin-top:14px;
-  /* Variables to keep table + outside cards fitting on different phones */
-  --m-card-w: clamp(28px, 7.6vw, 36px);
-  --m-card-h: calc(var(--m-card-w) * 1.4);
-  --m-out-x: clamp(34px, 7.2vw, 52px);
-  --m-out-y: clamp(58px, 9.5vw, 86px);
 
-  padding-top: calc(var(--m-out-y) + 22px);
-  padding-bottom: calc(var(--m-out-y) + 34px);
+  /* Smaller table + smaller cards so everything fits in one screen */
+  --m-card-w: clamp(24px, 6.6vw, 32px);
+  --m-card-h: calc(var(--m-card-w) * 1.35);
+
+  /* vertical room for top/bottom outside seats */
+  --m-out-y: clamp(54px, 9vw, 80px);
+
+  padding-top: calc(var(--m-out-y) + 18px);
+  padding-bottom: calc(var(--m-out-y) + 30px);
 }
 
 /* Ensure cards shrink appropriately on mobile */
@@ -20,7 +22,7 @@
   width: 100%;
   /* Smaller table so there is room for cards outside */
   /* Slightly smaller table to ensure room for outside cards */
-  height: min(48vh, 380px);
+  height: min(42vh, 330px);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: radial-gradient(900px 500px at 50% 20%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 55%),
@@ -59,7 +61,7 @@
 
 .m-seat{
   position:absolute;
-  width: clamp(108px, 30vw, 168px);
+  width: clamp(100px, 28vw, 156px);
   padding: 8px;
   border-radius: 12px;
   background: rgba(0,0,0,.18);
@@ -70,8 +72,8 @@
 }
 
 /* Hole cards: keep them with the player, but place the whole player box OUTSIDE the table */
-#m-seat-1 .row3, #m-seat-2 .row3, #m-seat-4 .row3, #m-seat-5 .row3{gap:5px;}
-.m-seat .row3{display:flex; gap:6px; margin-top:6px; justify-content:center;}
+#m-seat-1 .row3, #m-seat-2 .row3, #m-seat-4 .row3, #m-seat-5 .row3{gap:4px;}
+.m-seat .row3{display:flex; gap:5px; margin-top:6px; justify-content:center;}
 
 .m-seat .row1{display:flex; justify-content:space-between; gap:8px; align-items:center; font-weight:900; font-size:12px;}
 .m-seat .row2{display:flex; justify-content:space-between; gap:8px; font-size:11px; opacity:.92; margin-top:4px;}
@@ -84,17 +86,18 @@
    4 = right-top
    5 = right-bottom */
 /* Move player boxes OUTSIDE the oval */
-#m-seat-0{left:50%; top: calc(100% + 8px); transform: translateX(-50%);} 
-#m-seat-3{left:50%; bottom: calc(100% + 8px); transform: translateX(-50%);} 
-/* Side seats: keep them slightly outside the oval, but NOT off-screen */
-#m-seat-1{left: 6px; bottom: 18%;}
-#m-seat-2{left: 6px; top: 18%;}
-#m-seat-4{right: 6px; top: 18%;}
-#m-seat-5{right: 6px; bottom: 18%;}
+#m-seat-0{left:50%; top: calc(100% + 6px); transform: translateX(-50%);} 
+#m-seat-3{left:50%; bottom: calc(100% + 6px); transform: translateX(-50%);} 
 
-/* On side seats, align hole cards inward so they are fully visible */
-#m-seat-1 .row3, #m-seat-2 .row3{justify-content:flex-end;}
-#m-seat-4 .row3, #m-seat-5 .row3{justify-content:flex-start;}
+/* Side seats: outside the oval (not on the table) */
+#m-seat-1{right: calc(100% + 6px); bottom: 20%;}
+#m-seat-2{right: calc(100% + 6px); top: 20%;}
+#m-seat-4{left: calc(100% + 6px); top: 20%;}
+#m-seat-5{left: calc(100% + 6px); bottom: 20%;}
+
+/* Keep side hole cards fully visible by aligning inward */
+#m-seat-1 .row3, #m-seat-2 .row3{justify-content:flex-start;}
+#m-seat-4 .row3, #m-seat-5 .row3{justify-content:flex-end;}
 
 .actionbar{
   position: sticky;
