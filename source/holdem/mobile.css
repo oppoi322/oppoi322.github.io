@@ -1,6 +1,6 @@
 /* Mobile table layout (6-max oval) */
 
-.mobile-table{margin-top:14px; padding-top:64px; padding-bottom:72px;}
+.mobile-table{margin-top:14px; padding-top:92px; padding-bottom:120px;}
 
 .oval{
   width: 100%;
@@ -57,14 +57,14 @@
 
 /* Cards should sit OUTSIDE the felt (like real players holding cards) */
 .m-seat .row3{position: absolute; left: 8px; right: 8px; display:flex; gap:6px; z-index: 5;}
-#m-seat-0 .row3{top: -54px; justify-content:center;}
-#m-seat-3 .row3{bottom: -54px; justify-content:center;}
+#m-seat-0 .row3{top: -72px; justify-content:center;}
+#m-seat-3 .row3{bottom: -72px; justify-content:center;}
 
 /* Pull side cards closer to the seat box so they stay on-screen */
-#m-seat-1 .row3{right: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-start;}
-#m-seat-2 .row3{right: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-start;}
-#m-seat-4 .row3{left: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-end;}
-#m-seat-5 .row3{left: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-end;}
+#m-seat-1 .row3{right: -52px; top: 50%; transform: translateY(-50%); justify-content:flex-start;}
+#m-seat-2 .row3{right: -52px; top: 50%; transform: translateY(-50%); justify-content:flex-start;}
+#m-seat-4 .row3{left: -52px; top: 50%; transform: translateY(-50%); justify-content:flex-end;}
+#m-seat-5 .row3{left: -52px; top: 50%; transform: translateY(-50%); justify-content:flex-end;}
 .m-seat .row1{display:flex; justify-content:space-between; gap:8px; align-items:center; font-weight:800; font-size:12px;}
 .m-seat .row2{display:flex; justify-content:space-between; gap:8px; font-size:11px; opacity:.9; margin-top:4px;}
 
