@@ -390,8 +390,13 @@
         const styleName = s.isHuman ? '玩家' : s.profile.style.name;
 
         const show = GAME.handOver;
-        const c1 = s.isHuman || show ? renderCard(s.hole[0], true, false) : renderCard(s.hole[0], true, true);
-        const c2 = s.isHuman || show ? renderCard(s.hole[1], true, false) : renderCard(s.hole[1], true, true);
+        const hasHole = Array.isArray(s.hole) && s.hole.length >= 2;
+        // Guard: if hole cards are not yet dealt, show placeholders instead of breaking render.
+        const placeholder = { r:'?', s:'?' };
+        const h0 = hasHole ? s.hole[0] : placeholder;
+        const h1 = hasHole ? s.hole[1] : placeholder;
+        const c1 = s.isHuman || show ? renderCard(h0, true, false) : renderCard(h0, true, true);
+        const c2 = s.isHuman || show ? renderCard(h1, true, false) : renderCard(h1, true, true);
 
         box.innerHTML='';
         const row1=document.createElement('div');
@@ -411,7 +416,6 @@
 
         box.appendChild(row1);
         box.appendChild(row2);
-        box.appendChild(row2b);
         box.appendChild(row3);
       }
 
