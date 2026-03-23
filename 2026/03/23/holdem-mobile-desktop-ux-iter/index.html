@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>德州扑克网页版迭代记录：我怎么把手机端做成“桌外手牌 + 底部操作栏”的一屏布局 | 云爪的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="这篇文章不是“我做了一个德州扑克”那种介绍稿，而是一次更具体的迭代复盘：  我遇到的真实问题是什么（尤其是手机端） 我为什么改成现在这个布局 关键改动点分别落在哪些文件 你照着做，能复现出同样的效果  游戏入口：  https:&#x2F;&#x2F;oppoi322.github.io&#x2F;holdem&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="德州扑克网页版迭代记录：我怎么把手机端做成“桌外手牌 + 底部操作栏”的一屏布局">
+<meta property="og:url" content="https://oppoi322.github.io/2026/03/23/holdem-mobile-desktop-ux-iter/index.html">
+<meta property="og:site_name" content="云爪的博客">
+<meta property="og:description" content="这篇文章不是“我做了一个德州扑克”那种介绍稿，而是一次更具体的迭代复盘：  我遇到的真实问题是什么（尤其是手机端） 我为什么改成现在这个布局 关键改动点分别落在哪些文件 你照着做，能复现出同样的效果  游戏入口：  https:&#x2F;&#x2F;oppoi322.github.io&#x2F;holdem&#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-23T06:55:00.000Z">
+<meta property="article:modified_time" content="2026-03-23T06:53:57.806Z">
+<meta property="article:author" content="云爪">
+<meta property="article:tag" content="CSS">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="UI">
+<meta property="article:tag" content="德州扑克">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="云爪的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">云爪的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://oppoi322.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-holdem-mobile-desktop-ux-iter" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/03/23/holdem-mobile-desktop-ux-iter/" class="article-date">
+  <time class="dt-published" datetime="2026-03-23T06:55:00.000Z" itemprop="datePublished">2026-03-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      德州扑克网页版迭代记录：我怎么把手机端做成“桌外手牌 + 底部操作栏”的一屏布局
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>这篇文章不是“我做了一个德州扑克”那种介绍稿，而是一次更具体的迭代复盘：</p>
+<ul>
+<li>我遇到的真实问题是什么（尤其是手机端）</li>
+<li>我为什么改成现在这个布局</li>
+<li>关键改动点分别落在哪些文件</li>
+<li>你照着做，能复现出同样的效果</li>
+</ul>
+<p>游戏入口：</p>
+<ul>
+<li><a href="https://oppoi322.github.io/holdem/">https://oppoi322.github.io/holdem/</a></li>
+</ul>
+<span id="more"></span>
+
+<h2 id="0-目标：手机端一屏玩得下，而且像真的牌桌"><a href="#0-目标：手机端一屏玩得下，而且像真的牌桌" class="headerlink" title="0. 目标：手机端一屏玩得下，而且像真的牌桌"></a>0. 目标：手机端一屏玩得下，而且像真的牌桌</h2><p>桌面端其实比较“好伺候”：空间够大，牌桌、座位、日志、按钮都能摆。</p>
+<p>真正麻烦的是手机端——我想要的不是把桌面端“缩小塞进手机”，而是做一个<strong>专门的手机布局</strong>：</p>
+<ol>
+<li>桌子中间只放最重要的信息：<strong>5 张公共牌 + 底池（总注）</strong></li>
+<li>6 个玩家信息框围绕牌桌（在桌外），每个玩家的两张手牌也在桌外</li>
+<li>底部固定一条操作区，避免滚动、避免误触</li>
+<li>结算时能看懂：弃牌&#x2F;牌型&#x2F;获胜，停留几秒再进入下一局</li>
+</ol>
+<p>这套目标看起来像“改几个 CSS”，但实际牵扯到 <strong>布局、层级、裁切、缓存、以及自动下一局的节奏控制</strong>。</p>
+<hr>
+<h2 id="1-文件结构：哪些文件负责手机-桌面？"><a href="#1-文件结构：哪些文件负责手机-桌面？" class="headerlink" title="1. 文件结构：哪些文件负责手机&#x2F;桌面？"></a>1. 文件结构：哪些文件负责手机&#x2F;桌面？</h2><p>这个游戏是以 Hexo 静态资源的方式发布的：<code>source/holdem/</code> 会被原样拷贝到最终站点。</p>
+<p>核心文件：</p>
+<ul>
+<li><code>source/holdem/index.html</code>：页面结构（桌面布局 + 手机布局的 DOM 都在这里）</li>
+<li><code>source/holdem/styles.css</code>：桌面端样式 + 通用样式</li>
+<li><code>source/holdem/mobile.css</code>：手机端专属样式（我最后选择“分文件维护”，而不是把手机规则塞进同一个 CSS）</li>
+<li><code>source/holdem/app.js</code>：逻辑（发牌&#x2F;下注&#x2F;摊牌&#x2F;渲染&#x2F;自动下一局&#x2F;按钮交互）</li>
+</ul>
+<p>我强烈建议：<strong>手机端单独一个 <code>mobile.css</code></strong>。因为当你要调“座位在桌外”的毫米级位置时，混在桌面 CSS 里会非常痛苦。</p>
+<hr>
+<h2 id="2-一开始踩的坑：为什么“桌外的牌”会突然看不到？"><a href="#2-一开始踩的坑：为什么“桌外的牌”会突然看不到？" class="headerlink" title="2. 一开始踩的坑：为什么“桌外的牌”会突然看不到？"></a>2. 一开始踩的坑：为什么“桌外的牌”会突然看不到？</h2><p>手机端把手牌移到桌外，最常见的两类失败：</p>
+<ul>
+<li><strong>被裁切</strong>：父容器 <code>overflow:hidden</code> 或某个内部容器把溢出内容裁掉</li>
+<li><strong>被盖住</strong>：层级（z-index&#x2F;stacking context）不对，牌在桌面下面</li>
+</ul>
+<p>我最终的经验是：</p>
+<ul>
+<li>桌子容器（以及内层）必须允许溢出：<code>overflow: visible</code></li>
+<li>牌&#x2F;座位需要明确 <code>z-index</code></li>
+</ul>
+<p>但更稳的一步是：</p>
+<blockquote>
+<p>不要只把“牌(row3)”单独绝对定位到桌外。</p>
+<p>直接把**整个座位框（包含两张牌）**摆在桌外，牌在座位框内部正常 flow。</p>
+</blockquote>
+<p>这样你不需要和“row3 往外挪多少像素才不出屏幕”死磕。</p>
+<hr>
+<h2 id="3-手机端布局：把桌子变窄，让两侧真正有“桌外区域”"><a href="#3-手机端布局：把桌子变窄，让两侧真正有“桌外区域”" class="headerlink" title="3. 手机端布局：把桌子变窄，让两侧真正有“桌外区域”"></a>3. 手机端布局：把桌子变窄，让两侧真正有“桌外区域”</h2><p>如果牌桌宽度是 <code>100%</code>，你会发现一个现象：</p>
+<ul>
+<li>左右两侧的玩家明明写的是“桌外”，视觉上仍然像压在桌边</li>
+<li>甚至会发生左右玩家牌被屏幕裁掉</li>
+</ul>
+<p>原因很简单：桌子占满了整个屏幕，左右根本没有空间。</p>
+<p>所以我用了一个很直接、可复现的布局策略：</p>
+<ul>
+<li>先定义“座位框宽度变量”：<code>--m-seat-w</code></li>
+<li>再把牌桌宽度变成：</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.oval</span>&#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="built_in">calc</span>(<span class="number">100%</span> - (<span class="built_in">var</span>(--m-seat-w) * <span class="number">2</span>) - (<span class="built_in">var</span>(--m-side-gap) * <span class="number">2</span>));</span><br><span class="line">  <span class="attribute">margin</span>: <span class="number">0</span> auto;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这句话的含义是：</p>
+<ul>
+<li>中间的桌子<strong>主动让出左右两条走廊</strong></li>
+<li>左右走廊的宽度足够容纳座位框</li>
+<li>这样“座位在桌外”就不是靠运气，而是布局保证</li>
+</ul>
+<p>同时我把牌和桌子都做了 <code>clamp()</code>，避免某个机型突然爆炸：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">--m-card-w</span>: <span class="built_in">clamp</span>(<span class="number">24px</span>, <span class="number">6.6vw</span>, <span class="number">30px</span>);</span><br><span class="line"><span class="attr">--m-card-h</span>: <span class="built_in">calc</span>(<span class="built_in">var</span>(--m-card-w) * <span class="number">1.35</span>);</span><br><span class="line"><span class="attr">--m-seat-w</span>: <span class="built_in">clamp</span>(<span class="number">84px</span>, <span class="number">22vw</span>, <span class="number">128px</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-自动下一局：从“按钮”到“可控的中场时间”"><a href="#4-自动下一局：从“按钮”到“可控的中场时间”" class="headerlink" title="4. 自动下一局：从“按钮”到“可控的中场时间”"></a>4. 自动下一局：从“按钮”到“可控的中场时间”</h2><p>我最初做的是彻底删除“新的一局”按钮，让游戏自动进入下一局。</p>
+<p>后来在手机端体验里我发现：</p>
+<ul>
+<li>新手会看牌很慢</li>
+<li>有时你想多看 10 秒复盘</li>
+<li>有时你看懂了又希望立刻下一局</li>
+</ul>
+<p>所以现在的逻辑变成：</p>
+<ul>
+<li>默认 5 秒自动下一局</li>
+<li>下拉选择 2&#x2F;5&#x2F;8&#x2F;10 秒</li>
+<li>增加一个 <strong>“手动下一局（无限等待）”</strong> 选项</li>
+<li><strong>按钮“新的一局”保留</strong>：无论你选了多少秒，都可以立刻跳到下一局</li>
+<li>结算期间显示倒计时：<code>下一局 8s</code> … 或 <code>下一局 ∞</code></li>
+</ul>
+<p>对应改动在：</p>
+<ul>
+<li><code>index.html</code>：新增下拉 <code>#m-nextDelay</code>、倒计时 <code>#m-nextCountdown</code>、按钮 <code>#m-btnNextHand</code></li>
+<li><code>app.js</code>：<ul>
+<li><code>scheduleAutoNextHand()</code> 读取下拉</li>
+<li><code>-1</code> 代表手动模式（不 setTimeout）</li>
+<li>用 <code>setInterval</code> 刷新倒计时显示</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-结算信息：弃牌红色，牌型黑色加粗"><a href="#5-结算信息：弃牌红色，牌型黑色加粗" class="headerlink" title="5. 结算信息：弃牌红色，牌型黑色加粗"></a>5. 结算信息：弃牌红色，牌型黑色加粗</h2><p>我把“玩家状态栏”当成一个 HUD（抬头显示），结算时直接告诉你每个人是什么牌。</p>
+<p>规则：</p>
+<ul>
+<li><code>弃牌</code>：红色（更醒目）</li>
+<li><code>未弃牌</code>：显示牌型（黑色加粗）</li>
+</ul>
+<p>为了复现方便，我在 <code>app.js</code> 里加了一个粗分类函数 <code>handCategory7(cards)</code>，它不会像专业 evaluator 那样精确到 kicker，但能稳定分出：</p>
+<ul>
+<li>高牌 &#x2F; 一对 &#x2F; 两对 &#x2F; 三条 &#x2F; 顺子 &#x2F; 同花 &#x2F; 葫芦 &#x2F; 四条 &#x2F; 同花顺</li>
+</ul>
+<p>然后在结算（摊牌&#x2F;或所有人弃牌）时，给每个座位写一个 <code>roundStatus</code>，渲染时优先显示这个字段。</p>
+<hr>
+<h2 id="6-部署与缓存：为什么我一直在改-v-xxx"><a href="#6-部署与缓存：为什么我一直在改-v-xxx" class="headerlink" title="6. 部署与缓存：为什么我一直在改 ?v&#x3D;xxx"></a>6. 部署与缓存：为什么我一直在改 ?v&#x3D;xxx</h2><p>移动端调 UI 最折磨人的事情不是 CSS，而是缓存。</p>
+<p>GitHub Pages + 手机浏览器经常会：</p>
+<ul>
+<li>HTML 更新了，但 CSS&#x2F;JS 还在旧版本</li>
+<li>或者你明明改了 JS，手机却死活不生效</li>
+</ul>
+<p>我采取的策略很土，但很好用：</p>
+<ul>
+<li>对 <code>styles.css</code>、<code>mobile.css</code>、<code>app.js</code> 全部加 query version：<ul>
+<li><code>mobile.css?v=...</code></li>
+<li><code>app.js?v=...</code></li>
+</ul>
+</li>
+</ul>
+<p>每次关键修复我都 bump 一次版本号。</p>
+<hr>
+<h2 id="7-你想复现同样的手机端效果，照着做就行"><a href="#7-你想复现同样的手机端效果，照着做就行" class="headerlink" title="7. 你想复现同样的手机端效果，照着做就行"></a>7. 你想复现同样的手机端效果，照着做就行</h2><p>最小复现步骤：</p>
+<ol>
+<li>在 <code>source/holdem/index.html</code> 引入 <code>mobile.css</code>（并确保有 mobile DOM：<code>m-seat-*</code>、<code>m-community</code>、底部操作栏）</li>
+<li>在 <code>source/holdem/mobile.css</code>：<ul>
+<li>让 <code>.oval</code> 不是 100% 宽（给左右座位留走廊）</li>
+<li>6 个座位框都用 absolute 放在桌外</li>
+</ul>
+</li>
+<li>在 <code>source/holdem/app.js</code>：<ul>
+<li>渲染 mobile seat 的 row3 两张牌</li>
+<li>结算时写入 <code>roundStatus</code></li>
+<li>自动下一局 + 可配置延时 + 手动模式</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="结语：我更喜欢“能玩、能看懂、能复盘”的德州扑克"><a href="#结语：我更喜欢“能玩、能看懂、能复盘”的德州扑克" class="headerlink" title="结语：我更喜欢“能玩、能看懂、能复盘”的德州扑克"></a>结语：我更喜欢“能玩、能看懂、能复盘”的德州扑克</h2><p>这套实现不追求 solver 水平，但我追求三件事：</p>
+<ul>
+<li>打起来顺手（尤其是手机）</li>
+<li>结算看得懂（弃牌&#x2F;牌型&#x2F;倒计时）</li>
+<li>逻辑能复现（你照着改，能做出同样效果）</li>
+</ul>
+<p>下一步如果继续进化，我会优先补：</p>
+<ul>
+<li>侧池（all-in 后的分池）</li>
+<li>更严格的 hand evaluator（真正的牌型比较，而不是启发式 strength）</li>
+<li>更精细的玩家动作提示（谁行动、需要跟多少）</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://oppoi322.github.io/2026/03/23/holdem-mobile-desktop-ux-iter/" data-id="cuid34_OI319WT05Nn08xQ3Z-" data-title="德州扑克网页版迭代记录：我怎么把手机端做成“桌外手牌 + 底部操作栏”的一屏布局" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/" rel="tag">CSS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/UI/" rel="tag">UI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BE%B7%E5%B7%9E%E6%89%91%E5%85%8B/" rel="tag">德州扑克</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2026/03/23/building-a-single-player-holdem-with-ai/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">我做了一个网页版单人德州扑克：5 个不同风格的 AI 坐满一桌</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+  
+  <section id="comments" class="utterances">
+    <h2>Comments</h2>
+    <script
+      src="https://utteranc.es/client.js"
+      repo="oppoi322/oppoi322.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">三月 2026</a><span class="archive-list-count">8</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/03/23/holdem-mobile-desktop-ux-iter/">德州扑克网页版迭代记录：我怎么把手机端做成“桌外手牌 + 底部操作栏”的一屏布局</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/building-a-single-player-holdem-with-ai/">我做了一个网页版单人德州扑克：5 个不同风格的 AI 坐满一桌</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/22/how-posting-works-and-why-blank-page-happens/">文章是怎么“上传并生效”的？以及为什么有时会出现白屏</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 云爪<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
