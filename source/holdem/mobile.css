@@ -35,6 +35,7 @@
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.10);
   background: radial-gradient(800px 400px at 50% 30%, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 60%);
+  overflow: visible;
 }
 
 .center{
@@ -58,30 +59,21 @@
 
 .m-seat{
   position:absolute;
-  width: 32%;
-  max-width: 180px;
-  min-width: 112px;
+  width: clamp(120px, 32vw, 180px);
   padding: 8px;
   border-radius: 12px;
   background: rgba(0,0,0,.18);
   border: 1px solid rgba(255,255,255,.12);
   color: var(--text);
   overflow: visible;
-  z-index: 3;
+  z-index: 6;
 }
 
-/* Cards should sit OUTSIDE the felt (like real players holding cards) */
-.m-seat .row3{position: absolute; left: 8px; right: 8px; display:flex; gap:6px; z-index: 5;}
-#m-seat-0 .row3{top: calc(-1 * var(--m-out-y)); justify-content:center;}
-#m-seat-3 .row3{bottom: calc(-1 * var(--m-out-y)); justify-content:center;}
+/* Hole cards: keep them with the player, but place the whole player box OUTSIDE the table */
+.m-seat .row3{display:flex; gap:6px; margin-top:6px; justify-content:center;}
 
-/* Side cards offset outwards */
-#m-seat-1 .row3{right: calc(-1 * var(--m-out-x)); top: 50%; transform: translateY(-50%); justify-content:flex-start;}
-#m-seat-2 .row3{right: calc(-1 * var(--m-out-x)); top: 50%; transform: translateY(-50%); justify-content:flex-start;}
-#m-seat-4 .row3{left: calc(-1 * var(--m-out-x)); top: 50%; transform: translateY(-50%); justify-content:flex-end;}
-#m-seat-5 .row3{left: calc(-1 * var(--m-out-x)); top: 50%; transform: translateY(-50%); justify-content:flex-end;}
-.m-seat .row1{display:flex; justify-content:space-between; gap:8px; align-items:center; font-weight:800; font-size:12px;}
-.m-seat .row2{display:flex; justify-content:space-between; gap:8px; font-size:11px; opacity:.9; margin-top:4px;}
+.m-seat .row1{display:flex; justify-content:space-between; gap:8px; align-items:center; font-weight:900; font-size:12px;}
+.m-seat .row2{display:flex; justify-content:space-between; gap:8px; font-size:11px; opacity:.92; margin-top:4px;}
 
 /* Seat positions (6-max)
    0 = hero bottom
@@ -90,12 +82,13 @@
    3 = top
    4 = right-top
    5 = right-bottom */
-#m-seat-0{left:50%; bottom: 6px; transform: translateX(-50%);} 
-#m-seat-3{left:50%; top: 6px; transform: translateX(-50%);} 
-#m-seat-1{left: 6px; bottom: 80px;}
-#m-seat-2{left: 6px; top: 80px;}
-#m-seat-4{right: 6px; top: 80px;}
-#m-seat-5{right: 6px; bottom: 80px;}
+/* Move player boxes OUTSIDE the oval */
+#m-seat-0{left:50%; top: calc(100% + 8px); transform: translateX(-50%);} 
+#m-seat-3{left:50%; bottom: calc(100% + 8px); transform: translateX(-50%);} 
+#m-seat-1{right: calc(100% + 8px); bottom: 18%;}
+#m-seat-2{right: calc(100% + 8px); top: 18%;}
+#m-seat-4{left: calc(100% + 8px); top: 18%;}
+#m-seat-5{left: calc(100% + 8px); bottom: 18%;}
 
 .actionbar{
   position: sticky;
