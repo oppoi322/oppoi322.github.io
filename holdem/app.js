@@ -51,6 +51,65 @@
   // We compute a strength score in [0..1] from 7 cards.
   // It's not perfect ranking, but captures big categories.
 
+  function handCategory7(cards){
+    // Returns a coarse category name based on 7 cards.
+    const ranks = cards.map(c => RANK_VALUE.get(c.r)).sort((a,b)=>b-a);
+    const suitMap = new Map();
+    const rankCount = new Map();
+    for(const c of cards){
+      suitMap.set(c.s, (suitMap.get(c.s)||0)+1);
+      const v=RANK_VALUE.get(c.r);
+      rankCount.set(v, (rankCount.get(v)||0)+1);
+    }
+
+    const counts = [...rankCount.entries()].sort((a,b)=> (b[1]-a[1]) || (b[0]-a[0]));
+    const isFlush = [...suitMap.values()].some(n => n>=5);
+
+    // straight check (A can be low)
+    const uniq = [...new Set(ranks)].sort((a,b)=>b-a);
+    let straightHigh = null;
+    const wheel = [14,5,4,3,2];
+    const hasWheel = wheel.every(v => uniq.includes(v));
+    if(hasWheel) straightHigh = 5;
+    for(let i=0;i<=uniq.length-5;i++){
+      const slice = uniq.slice(i,i+5);
+      if(slice[0]-slice[4]===4){
+        straightHigh = Math.max(straightHigh||0, slice[0]);
+      }
+    }
+    const isStraight = straightHigh !== null;
+
+    const topCount = counts[0]?.[1] || 1;
+    const secondCount = counts[1]?.[1] || 1;
+    const hasTrips = topCount===3 || secondCount===3;
+    const pairs = counts.filter(x=>x[1]===2).length;
+
+    let cat = 0; // 0..8
+    if(isStraight && isFlush) cat = 8;
+    else if(topCount===4) cat = 7;
+    else if((topCount===3 && secondCount>=2) || (hasTrips && pairs>=1)) cat = 6;
+    else if(isFlush) cat = 5;
+    else if(isStraight) cat = 4;
+    else if(topCount===3) cat = 3;
+    else if(pairs>=2) cat = 2;
+    else if(topCount===2) cat = 1;
+    else cat = 0;
+
+    const name = [
+      '高牌',
+      '一对',
+      '两对',
+      '三条',
+      '顺子',
+      '同花',
+      '葫芦',
+      '四条',
+      '同花顺'
+    ][cat] || '高牌';
+
+    return {cat, name};
+  }
+
   function eval7(cards){
     // counts
     const ranks = cards.map(c => RANK_VALUE.get(c.r)).sort((a,b)=>b-a);
@@ -405,9 +464,12 @@
 
         const row2=document.createElement('div');
         row2.className='row2';
-        // show bet or folded/all-in state + balance
+        // show bet or folded/all-in state + balance (or showdown result for 2s)
         const betOrState = stateMark || `下注 ${fmt(s.bet)}`;
-        row2.innerHTML = `<span>${betOrState}</span><span>余额 ${fmt(s.stack)}</span>`;
+        const rs = s.roundStatus;
+        const leftText = rs ? rs.text : betOrState;
+        const cls = rs ? `st-${rs.kind}` : '';
+        row2.innerHTML = `<span class="st ${cls}">${leftText}</span><span>余额 ${fmt(s.stack)}</span>`;
 
         const row3=document.createElement('div');
         row3.className='row3';
@@ -473,6 +535,9 @@
   }
 
   function newHand(){
+    // clear last hand status labels
+    GAME.seats.forEach(s=>{ delete s.roundStatus; });
+
     GAME.handOver=false;
     GAME.community=[];
     GAME.deck = shuffle(makeDeck());
@@ -592,10 +657,23 @@
     const w=GAME.seats[winnerIdx];
     w.stack += GAME.pot;
     log(`\n${w.name} 赢下底池 ${fmt(GAME.pot)}（其他人弃牌）。`);
+
+    for(const s of GAME.seats){
+      if(!s.inHand) continue;
+      if(s.folded){
+        s.roundStatus = { text: '弃牌', kind: 'fold' };
+      }else if(s===w){
+        s.roundStatus = { text: '获胜', kind: 'win' };
+      }else{
+        s.roundStatus = { text: '未摊牌', kind: 'hand' };
+      }
+    }
+
     GAME.pot=0;
     GAME.handOver=true;
     render();
 
+    GAME.autoNextDelayMs = 2000;
     scheduleAutoNextHand();
   }
 
@@ -655,6 +733,21 @@
       log(`平分底池：${winners.map(w=>w.p.name).join('、')} 各得 ${fmt(share)}。`);
     }
 
+    // settle status line for 2s: folded=red, otherwise bold black category
+    for(const s of GAME.seats){
+      if(!s.inHand) continue;
+      if(s.folded){
+        s.roundStatus = { text: '弃牌', kind: 'fold' };
+      }else{
+        try{
+          const hc = handCategory7(s.hole.concat(GAME.community));
+          s.roundStatus = { text: hc.name, kind: 'hand' };
+        }catch(e){
+          s.roundStatus = { text: '摊牌', kind: 'hand' };
+        }
+      }
+    }
+
     // reveal
     scored.forEach(({p,strength})=>{
       log(`${p.name} 手牌 ${cardToText(p.hole[0])} ${cardToText(p.hole[1])} 强度≈${strength.toFixed(2)}`);
@@ -664,6 +757,8 @@
     GAME.handOver=true;
     render();
 
+    // clear after delay (we will start next hand after 2s)
+    GAME.autoNextDelayMs = 2000;
     scheduleAutoNextHand();
   }
 
