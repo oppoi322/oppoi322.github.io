@@ -8,8 +8,9 @@
   --m-card-h: calc(var(--m-card-w) * 1.35);
 
   /* Seat box width (used to carve horizontal space for side players) */
-  --m-seat-w: clamp(92px, 24vw, 140px);
-  --m-side-gap: 6px;
+  /* Seat box width: smaller so the table can be wider without overlaps */
+  --m-seat-w: clamp(84px, 22vw, 128px);
+  --m-side-gap: 4px;
 
   /* vertical room for top/bottom outside seats */
   --m-out-y: clamp(54px, 9vw, 80px);
@@ -66,7 +67,7 @@
 .m-seat{
   position:absolute;
   width: var(--m-seat-w);
-  padding: 8px;
+  padding: 7px;
   border-radius: 12px;
   background: rgba(0,0,0,.18);
   border: 1px solid rgba(255,255,255,.12);
@@ -79,8 +80,8 @@
 #m-seat-1 .row3, #m-seat-2 .row3, #m-seat-4 .row3, #m-seat-5 .row3{gap:4px;}
 .m-seat .row3{display:flex; gap:5px; margin-top:6px; justify-content:center;}
 
-.m-seat .row1{display:flex; justify-content:space-between; gap:8px; align-items:center; font-weight:900; font-size:12px;}
-.m-seat .row2{display:flex; justify-content:space-between; gap:8px; font-size:11px; opacity:.92; margin-top:4px;}
+.m-seat .row1{display:flex; justify-content:space-between; gap:6px; align-items:center; font-weight:900; font-size:11px;}
+.m-seat .row2{display:flex; justify-content:space-between; gap:6px; font-size:10px; opacity:.92; margin-top:4px;}
 
 /* Seat positions (6-max)
    0 = hero bottom
@@ -94,10 +95,10 @@
 #m-seat-3{left:50%; bottom: calc(100% + 6px); transform: translateX(-50%);} 
 
 /* Side seats: outside the oval (not on the table) */
-#m-seat-1{right: calc(100% + var(--m-side-gap)); bottom: 10%;}
-#m-seat-2{right: calc(100% + var(--m-side-gap)); top: 10%;}
-#m-seat-4{left: calc(100% + var(--m-side-gap)); top: 10%;}
-#m-seat-5{left: calc(100% + var(--m-side-gap)); bottom: 10%;}
+#m-seat-1{right: calc(100% + var(--m-side-gap)); bottom: 8%;}
+#m-seat-2{right: calc(100% + var(--m-side-gap)); top: 8%;}
+#m-seat-4{left: calc(100% + var(--m-side-gap)); top: 8%;}
+#m-seat-5{left: calc(100% + var(--m-side-gap)); bottom: 8%;}
 
 /* Keep side hole cards fully visible by aligning inward */
 #m-seat-1 .row3, #m-seat-2 .row3{justify-content:flex-start;}
