@@ -272,6 +272,8 @@
     autoNext: true,
     autoNextDelayMs: 5000, // default 5s between hands
     autoTimer: null,
+    autoDueAt: null,
+    countdownTimer: null,
   };
 
   function log(msg){
@@ -283,6 +285,13 @@
     box.scrollTop = box.scrollHeight;
   }
 
+  function setNextCountdown(ms){
+    const el = document.getElementById('m-nextCountdown');
+    if(!el) return;
+    if(ms<=0){ el.textContent=''; return; }
+    el.textContent = `下一局 ${Math.ceil(ms/1000)}s`;
+  }
+
   function scheduleAutoNextHand(){
     if(!GAME.autoNext) return;
 
@@ -292,6 +301,7 @@
       const v = Number(sel.value);
       if(!Number.isNaN(v) && v>=0) GAME.autoNextDelayMs = v;
     }
+
     // If someone is busted and only one player has chips, don't loop forever.
     const alive = GAME.seats.filter(s => seatAlive(s));
     if(alive.length <= 1){
@@ -300,7 +310,26 @@
     }
 
     if(GAME.autoTimer) clearTimeout(GAME.autoTimer);
+    if(GAME.countdownTimer) clearInterval(GAME.countdownTimer);
+
+    GAME.autoDueAt = Date.now() + GAME.autoNextDelayMs;
+    setNextCountdown(GAME.autoNextDelayMs);
+    GAME.countdownTimer = setInterval(()=>{
+      const left = (GAME.autoDueAt||0) - Date.now();
+      if(left<=0){
+        setNextCountdown(0);
+        clearInterval(GAME.countdownTimer);
+        GAME.countdownTimer=null;
+        return;
+      }
+      setNextCountdown(left);
+    }, 250);
+
     GAME.autoTimer = setTimeout(()=>{
+      setNextCountdown(0);
+      if(GAME.countdownTimer) clearInterval(GAME.countdownTimer);
+      GAME.countdownTimer=null;
+      GAME.autoDueAt=null;
       if(GAME.handOver) newHand();
     }, GAME.autoNextDelayMs);
   }
@@ -680,7 +709,6 @@
     GAME.handOver=true;
     render();
 
-    GAME.autoNextDelayMs = 2000;
     scheduleAutoNextHand();
   }
 
@@ -764,8 +792,7 @@
     GAME.handOver=true;
     render();
 
-    // clear after delay (we will start next hand after 2s)
-    GAME.autoNextDelayMs = 2000;
+    // clear after delay (use selected between-hands time)
     scheduleAutoNextHand();
   }
 
