@@ -1,11 +1,26 @@
 /* Mobile table layout (6-max oval) */
 
-.mobile-table{margin-top:14px; padding-top:64px; padding-bottom:72px;}
+.mobile-table{
+  margin-top:14px;
+  /* Variables to keep table + outside cards fitting on different phones */
+  --m-card-w: clamp(28px, 7.6vw, 36px);
+  --m-card-h: calc(var(--m-card-w) * 1.4);
+  --m-out-x: clamp(34px, 7.2vw, 52px);
+  --m-out-y: clamp(58px, 9.5vw, 86px);
+
+  padding-top: calc(var(--m-out-y) + 22px);
+  padding-bottom: calc(var(--m-out-y) + 34px);
+}
+
+/* Ensure cards shrink appropriately on mobile */
+.mobile-table .card{width: var(--m-card-w); height: var(--m-card-h);}
+.mobile-table .card.small{width: calc(var(--m-card-w) * .92); height: calc(var(--m-card-h) * .92); font-size:12px;}
 
 .oval{
   width: 100%;
   /* Smaller table so there is room for cards outside */
-  height: min(52vh, 420px);
+  /* Slightly smaller table to ensure room for outside cards */
+  height: min(48vh, 380px);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: radial-gradient(900px 500px at 50% 20%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 55%),
@@ -57,14 +72,14 @@
 
 /* Cards should sit OUTSIDE the felt (like real players holding cards) */
 .m-seat .row3{position: absolute; left: 8px; right: 8px; display:flex; gap:6px; z-index: 5;}
-#m-seat-0 .row3{top: -54px; justify-content:center;}
-#m-seat-3 .row3{bottom: -54px; justify-content:center;}
+#m-seat-0 .row3{top: calc(-1 * var(--m-out-y)); justify-content:center;}
+#m-seat-3 .row3{bottom: calc(-1 * var(--m-out-y)); justify-content:center;}
 
-/* Pull side cards closer to the seat box so they stay on-screen */
-#m-seat-1 .row3{right: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-start;}
-#m-seat-2 .row3{right: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-start;}
-#m-seat-4 .row3{left: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-end;}
-#m-seat-5 .row3{left: -46px; top: 50%; transform: translateY(-50%); justify-content:flex-end;}
+/* Side cards offset outwards */
+#m-seat-1 .row3{right: calc(-1 * var(--m-out-x)); top: 50%; transform: translateY(-50%); justify-content:flex-start;}
+#m-seat-2 .row3{right: calc(-1 * var(--m-out-x)); top: 50%; transform: translateY(-50%); justify-content:flex-start;}
+#m-seat-4 .row3{left: calc(-1 * var(--m-out-x)); top: 50%; transform: translateY(-50%); justify-content:flex-end;}
+#m-seat-5 .row3{left: calc(-1 * var(--m-out-x)); top: 50%; transform: translateY(-50%); justify-content:flex-end;}
 .m-seat .row1{display:flex; justify-content:space-between; gap:8px; align-items:center; font-weight:800; font-size:12px;}
 .m-seat .row2{display:flex; justify-content:space-between; gap:8px; font-size:11px; opacity:.9; margin-top:4px;}
 
