@@ -125,6 +125,20 @@ GrabCut 自动抠图后的透明 PNG：
 
 ![](/rose_fist/assets/rose_user_selected4_cutout.png)
 
+## 你选择的玫瑰素材（版本 5）
+
+最终效果：
+
+![](/rose_fist/site_images/rock_with_user_rose5.png)
+
+原图（抠图前）：
+
+![](/rose_fist/assets/rose_user_selected5.jpg)
+
+GrabCut 自动抠图后的透明 PNG：
+
+![](/rose_fist/assets/rose_user_selected5_cutout.png)
+
 （本次使用“你选择的玫瑰照片 + GrabCut 自动抠图”的 cutout 做测试素材：
 - 原图：`assets/rose_user_selected.jpg`
 - 抠图：`src/grabcut_cutout.py` 自动生成 `assets/rose_user_selected_cutout.png`）
