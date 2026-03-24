@@ -64,7 +64,11 @@ categories:
 
 ![](/rose_fist/assets/rock_sample.png)
 
-结果（叠加玫瑰）：
+结果（叠加玫瑰，模拟“握住枝条，花朵在外”）：
+
+![](/rose_fist/site_images/rock_with_rose_held.png)
+
+（对比：旧版“整朵玫瑰直接贴在手上”）
 
 ![](/rose_fist/site_images/rock_with_rose.png)
 
