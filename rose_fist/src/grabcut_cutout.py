@@ -4,7 +4,7 @@ This script converts a photo (JPEG/PNG) into a transparent-background PNG cutout
 It is intentionally dependency-light: only OpenCV + numpy are used.
 
 Usage:
-  python src/grabcut_cutout.py --input assets/picsum_4.jpg --output assets/rose_real_cutout.png
+  python src/grabcut_cutout.py --input assets/rose_user_selected.jpg --output assets/rose_user_selected_cutout.png
 
 Notes:
 - GrabCut is heuristic. It works best when the foreground object is centered and
