@@ -64,9 +64,15 @@ categories:
 
 ![](/rose_fist/assets/rock_sample.png)
 
-结果（叠加玫瑰，模拟“握住枝条，花朵在外”）：
+结果（叠加玫瑰：模拟“握住枝条，花朵在外”，并让花朵朝向大拇指方向）：
 
-![](/rose_fist/site_images/rock_with_rose_held.png)
+- FluentUI Emoji（玫瑰枝条相对更长）：
+
+![](/rose_fist/site_images/rock_with_rose_held_thumb_fluent.png)
+
+- Twemoji（对比）：
+
+![](/rose_fist/site_images/rock_with_rose_held_thumb_twemoji.png)
 
 （对比：旧版“整朵玫瑰直接贴在手上”）
 

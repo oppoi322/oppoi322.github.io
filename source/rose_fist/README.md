@@ -34,7 +34,11 @@ pip install mediapipe==0.10.14 opencv-python numpy pillow
 python src/overlay_rose_on_fist.py \
   --input assets/rock_sample.png \
   --output outputs/rock_with_rose.png \
-  --rose assets/rose_twemoji.png
+  --rose assets/rose_fluent.png
+
+# 可选：
+# --rose assets/rose_twemoji.png
+# --rose assets/rose_openmoji.png
 ```
 
 ### 2) 摄像头（webcam index 0）
@@ -44,7 +48,7 @@ python src/overlay_rose_on_fist.py \
 python src/overlay_rose_on_fist.py \
   --input 0 \
   --output outputs/webcam.mp4 \
-  --rose assets/rose_twemoji.png
+  --rose assets/rose_fluent.png
 ```
 
 ## 参数

@@ -21,7 +21,7 @@
 
 ## 迭代评估 02：准备素材（玫瑰 PNG）
 - 发现/问题：尝试从 Wikimedia 下载 `Rose.png`，多次 **SSL timeout**。
-- 解决：改用 GitHub 可访问的资源：Twemoji 的玫瑰 emoji PNG（透明背景）。
+- 解决：改用 GitHub 可访问的资源：Twemoji 的玫瑰 emoji PNG（透明背景）。随后为了“枝条更长”与更清晰展示，又补充了 Fluent UI Emoji / OpenMoji 版本作为可选素材。
 - 结果：获得 `assets/rose_twemoji.png`。
 
 ## 迭代评估 03：准备握拳测试图片（真实图片）

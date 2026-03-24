@@ -76,7 +76,8 @@
   const resultEl = $("result");
   const debugEl = $("debug");
 
-  const ROSE_URL = "../assets/rose_twemoji.png";
+  // default rose: FluentUI Emoji (bigger + clearer, and stem is longer-looking)
+  const ROSE_URL = "../assets/rose_fluent.png";
 
   let inputImageBitmap = null;
   let roseImg = null;
@@ -232,12 +233,12 @@
         const pose = palmPose(pts, canvas.width, canvas.height);
 
         // "Held" illusion (simple version in browser):
-        // 1) draw stem anchored near palm
-        // 2) redraw a fist-area patch (cropped from original) to occlude stem
-        // 3) draw flower slightly above so it stays outside
+        // 1) draw the rose anchored so that the lower part goes into the fist
+        // 2) redraw a fist-area patch (cropped from original) to occlude the stem
         //
-        // Here we approximate "stem" by drawing full rose but with a vertical offset
-        // and then occluding the center using a cropped hand bbox from the original.
+        // Requirement: the flower should be towards the thumb direction.
+        // In browser we approximate by using MediaPipe's pose.rot (hand direction),
+        // while the Python version aligns precisely using thumb tip vector.
 
         // compute bbox from landmarks
         let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
