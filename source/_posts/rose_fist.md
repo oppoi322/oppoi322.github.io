@@ -69,19 +69,19 @@ categories:
 2) 花朵在 **大拇指那一侧**
 3) 枝条被手握住（遮挡））：
 
-![](/rose_fist/site_images/rock_with_real_rose.png)
+![](/rose_fist/site_images/rock_with_user_rose.png)
 
-玫瑰原始照片（抠图前）：
+你选择的玫瑰原图（抠图前）：
 
-![](/rose_fist/assets/rose_photo_source.jpg)
+![](/rose_fist/assets/rose_user_selected.jpg)
 
-抠图后的透明 PNG（用于叠加）：
+GrabCut 自动抠图后的透明 PNG（用于叠加）：
 
-![](/rose_fist/assets/rose_real_cutout.png)
+![](/rose_fist/assets/rose_user_selected_cutout.png)
 
-（本次使用“真实玫瑰照片 + GrabCut 自动抠图”的 cutout 做测试素材：
-- 来源：eXternOS-Base 仓库内的 `legacy/yellow-rose.jpg`（真实玫瑰照片，非卡通）
-- 抠图：`src/grabcut_cutout.py` 自动生成 `assets/rose_real_cutout.png`）
+（本次使用“你选择的玫瑰照片 + GrabCut 自动抠图”的 cutout 做测试素材：
+- 原图：`assets/rose_user_selected.jpg`
+- 抠图：`src/grabcut_cutout.py` 自动生成 `assets/rose_user_selected_cutout.png`）
 
 （对比：之前“仅花朝向大拇指”的版本）
 

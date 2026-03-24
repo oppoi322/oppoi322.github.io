@@ -83,10 +83,10 @@
 ## 迭代评估 13：真实玫瑰照片抠图（GrabCut）
 - 发现/问题：用户要求不用卡通玫瑰，必须用真实玫瑰抠图。
 - 解决：
-  - 从网络下载真实照片（示例使用 picsum 的 seed=4 图片做演示素材）。
-  - 使用 OpenCV GrabCut 自动抠图生成透明 PNG：`src/grabcut_cutout.py` → `assets/rose_real_cutout.png`。
-  - 使用该 cutout 作为玫瑰素材，生成最终叠加结果：`outputs/rock_with_real_rose.png`。
-- 结果：用“真实照片 cutout”跑通整条管线。
+  - 使用用户提供的真实玫瑰照片：`assets/rose_user_selected.jpg`。
+  - 使用 OpenCV GrabCut 自动抠图生成透明 PNG：`src/grabcut_cutout.py` → `assets/rose_user_selected_cutout.png`。
+  - 使用该 cutout 作为玫瑰素材，生成最终叠加结果：`outputs/rock_with_user_rose.png`。
+- 结果：用“用户指定的真实玫瑰 cutout”跑通整条管线。
 
 ---
 
