@@ -129,9 +129,13 @@ GrabCut 自动抠图后的透明 PNG：
 
 最终效果：
 
-![](/rose_fist/site_images/rock_with_user_rose5_fix.png)
+![](/rose_fist/site_images/rock_with_user_rose5_centroid.png)
 
-（已修正：花朵在大拇指侧；并且让花朵下方与小拇指侧各露出少量绿枝条。）
+（已修正：使用“花朵重心”判定拇指侧；并且让花朵下方与小拇指侧各露出少量绿枝条。）
+
+（对比：上一版）
+
+![](/rose_fist/site_images/rock_with_user_rose5_fix.png)
 
 原图（抠图前）：
 

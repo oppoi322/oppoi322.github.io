@@ -238,15 +238,22 @@ def side_of_vector(v: np.ndarray, p: np.ndarray) -> float:
     return float(v[0] * p[1] - v[1] * p[0])
 
 
-def flower_direction_deg_in_image(rose_flower_rgba: np.ndarray, stem_anchor_xy: tuple[int, int]) -> float:
-    """Compute the direction from stem anchor to flower centroid in the rose image."""
-    alpha = rose_flower_rgba[..., 3]
+def alpha_centroid_xy(rgba: np.ndarray) -> tuple[float, float] | None:
+    """Centroid of non-transparent pixels in *image coordinates* (x,y)."""
+    alpha = rgba[..., 3]
     ys, xs = np.where(alpha > 0)
     if len(xs) == 0:
+        return None
+    return float(xs.mean()), float(ys.mean())
+
+
+def flower_direction_deg_in_image(rose_flower_rgba: np.ndarray, stem_anchor_xy: tuple[int, int]) -> float:
+    """Compute the direction from stem anchor to flower centroid in the rose image."""
+    c = alpha_centroid_xy(rose_flower_rgba)
+    if c is None:
         # default: up
         return -90.0
-    cx = float(xs.mean())
-    cy = float(ys.mean())
+    cx, cy = c
     ax, ay = stem_anchor_xy
     v = np.array([cx - ax, cy - ay], dtype=np.float32)
     return float(np.degrees(np.arctan2(v[1], v[0])))
@@ -407,13 +414,39 @@ def process_image(input_path: str, output_path: str, rose_path: str, cfg: FistHe
         rose_axis = best_axis
 
         # Align flower direction to chosen rose_axis.
-        rot = rose_axis - flower_dir0
+        # But decide between rot and rot+180 by checking where the flower *centroid* lands.
+        rot0 = rose_axis - flower_dir0
 
-        # Final safety: ensure flower side matches thumb side; flip 180 if not.
-        flower_vec = np.array([np.cos(np.radians(rose_axis)), np.sin(np.radians(rose_axis))], dtype=np.float32)
-        flower_side = side_of_vector(v, flower_vec)
-        if thumb_side * flower_side < 0:
-            rot += 180.0
+        flower_centroid0 = alpha_centroid_xy(flower_rgba0)
+        if flower_centroid0 is None:
+            rot = rot0
+        else:
+            # vector (in rose image coords) from stem anchor to flower centroid
+            fc0 = np.array(
+                [flower_centroid0[0] - stem_anchor0[0], flower_centroid0[1] - stem_anchor0[1]],
+                dtype=np.float32,
+            )
+
+            def side_after(rot_deg: float) -> float:
+                th = np.radians(rot_deg)
+                c, s = float(np.cos(th)), float(np.sin(th))
+                R = np.array([[c, -s], [s, c]], dtype=np.float32)
+                fc = R @ fc0
+                return side_of_vector(v, fc)
+
+            side0 = side_after(rot0)
+            side1 = side_after(rot0 + 180.0)
+
+            # Choose the rotation that puts the flower centroid on the same side as the thumb.
+            # If ambiguous, keep rot0.
+            if thumb_side == 0:
+                rot = rot0
+            elif thumb_side * side0 > 0:
+                rot = rot0
+            elif thumb_side * side1 > 0:
+                rot = rot0 + 180.0
+            else:
+                rot = rot0
 
         stem_rgba = rotate_and_resize_rgba(stem_rgba0, size_px=size_px, rotation_deg=rot)
         flower_rgba = rotate_and_resize_rgba(flower_rgba0, size_px=size_px, rotation_deg=rot)
