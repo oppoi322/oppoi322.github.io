@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo） | 云爪的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="这篇文章介绍我做的 rose_fist 小项目：  当图片中检测到 握拳（fist&#x2F;rock） 时，在拳头（掌心位置附近）叠加一朵玫瑰 PNG，让它看起来像“手里握着玫瑰”。 同时提供一个 网页端 Demo：可以在文章网页中上传图片，直接看到效果。  项目源码在本仓库：source&#x2F;rose_fist&#x2F;。 1. 在线 Demo打开：&#x2F;rose_fist&#x2F;demo&amp;#x">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）">
+<meta property="og:url" content="https://oppoi322.github.io/2026/03/24/rose_fist/index.html">
+<meta property="og:site_name" content="云爪的博客">
+<meta property="og:description" content="这篇文章介绍我做的 rose_fist 小项目：  当图片中检测到 握拳（fist&#x2F;rock） 时，在拳头（掌心位置附近）叠加一朵玫瑰 PNG，让它看起来像“手里握着玫瑰”。 同时提供一个 网页端 Demo：可以在文章网页中上传图片，直接看到效果。  项目源码在本仓库：source&#x2F;rose_fist&#x2F;。 1. 在线 Demo打开：&#x2F;rose_fist&#x2F;demo&amp;#x">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oppoi322.github.io/rose_fist/assets/rock_sample.png">
+<meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/rock_with_rose.png">
+<meta property="og:image" content="https://oppoi322.github.io/rose_fist/assets/paper_sample.png">
+<meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/paper_with_rose.png">
+<meta property="og:image" content="https://oppoi322.github.io/rose_fist/assets/scissors_sample.png">
+<meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/scissors_with_rose.png">
+<meta property="article:published_time" content="2026-03-24T04:45:00.000Z">
+<meta property="article:modified_time" content="2026-03-24T04:44:36.975Z">
+<meta property="article:author" content="云爪">
+<meta property="article:tag" content="ComputerVision">
+<meta property="article:tag" content="Demo">
+<meta property="article:tag" content="MediaPipe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oppoi322.github.io/rose_fist/assets/rock_sample.png">
+  
+    <link rel="alternate" href="/atom.xml" title="云爪的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">云爪的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://oppoi322.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-rose_fist" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/03/24/rose_fist/" class="article-date">
+  <time class="dt-published" datetime="2026-03-24T04:45:00.000Z" itemprop="datePublished">2026-03-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Projects/">Projects</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>这篇文章介绍我做的 <strong>rose_fist</strong> 小项目：</p>
+<ul>
+<li>当图片中检测到 <strong>握拳（fist&#x2F;rock）</strong> 时，在拳头（掌心位置附近）叠加一朵玫瑰 PNG，让它看起来像“手里握着玫瑰”。</li>
+<li>同时提供一个 <strong>网页端 Demo</strong>：可以在文章网页中上传图片，直接看到效果。</li>
+</ul>
+<p>项目源码在本仓库：<code>source/rose_fist/</code>。</p>
+<h2 id="1-在线-Demo"><a href="#1-在线-Demo" class="headerlink" title="1. 在线 Demo"></a>1. 在线 Demo</h2><p>打开：<strong>&#x2F;rose_fist&#x2F;demo&#x2F;</strong></p>
+<ul>
+<li>你可以上传任意图片</li>
+<li>若判断为握拳，会叠加玫瑰</li>
+<li>若非握拳，不叠加</li>
+</ul>
+<blockquote>
+<p>Demo 纯前端实现，无需后端。</p>
+</blockquote>
+<h2 id="2-核心思路"><a href="#2-核心思路" class="headerlink" title="2. 核心思路"></a>2. 核心思路</h2><h3 id="2-1-手部检测"><a href="#2-1-手部检测" class="headerlink" title="2.1 手部检测"></a>2.1 手部检测</h3><p>使用 <strong>MediaPipe Hands &#x2F; HandLandmarker</strong> 输出 21 个手部关键点。</p>
+<h3 id="2-2-“握拳”判定（启发式规则）"><a href="#2-2-“握拳”判定（启发式规则）" class="headerlink" title="2.2 “握拳”判定（启发式规则）"></a>2.2 “握拳”判定（启发式规则）</h3><p>我用四根手指（食指&#x2F;中指&#x2F;无名指&#x2F;小指）的 <strong>PIP 关节角度</strong>做判断：</p>
+<ul>
+<li>角度接近 180°：手指较直（打开）</li>
+<li>角度很小：手指弯曲（握拳时常见）</li>
+</ul>
+<p>规则：</p>
+<ul>
+<li>若 <code>PIP angle &lt; 160°</code> 视为该手指“弯曲”</li>
+<li>统计弯曲手指数量 <code>curled_count</code></li>
+<li>当 <code>curled_count &gt;= 3</code> 判定为 <strong>握拳</strong></li>
+</ul>
+<p>这个规则不是训练出来的模型，但实现简单、可解释，足够作为 Demo。</p>
+<h3 id="2-3-玫瑰叠加"><a href="#2-3-玫瑰叠加" class="headerlink" title="2.3 玫瑰叠加"></a>2.3 玫瑰叠加</h3><ul>
+<li>玫瑰素材使用透明背景 PNG（Twemoji）</li>
+<li>玫瑰位置：用 <code>wrist + 四个 MCP</code> 的均值近似 <strong>掌心中心</strong></li>
+<li>玫瑰大小：根据手部关键点 bbox 估算</li>
+<li>玫瑰旋转：用 <code>wrist -&gt; middle_mcp</code> 的方向估计手的朝向</li>
+</ul>
+<h2 id="3-测试图片与最终效果（必须可见）"><a href="#3-测试图片与最终效果（必须可见）" class="headerlink" title="3. 测试图片与最终效果（必须可见）"></a>3. 测试图片与最终效果（必须可见）</h2><p>我选用了 Rock&#x2F;Paper&#x2F;Scissors 数据示例图做测试：</p>
+<h3 id="3-1-输入（握拳-rock）"><a href="#3-1-输入（握拳-rock）" class="headerlink" title="3.1 输入（握拳 &#x2F; rock）"></a>3.1 输入（握拳 &#x2F; rock）</h3><p>原图：</p>
+<p><img src="/rose_fist/assets/rock_sample.png"></p>
+<p>结果（叠加玫瑰）：</p>
+<p><img src="/rose_fist/site_images/rock_with_rose.png"></p>
+<h3 id="3-2-输入（张开手-paper）"><a href="#3-2-输入（张开手-paper）" class="headerlink" title="3.2 输入（张开手 &#x2F; paper）"></a>3.2 输入（张开手 &#x2F; paper）</h3><p>原图：</p>
+<p><img src="/rose_fist/assets/paper_sample.png"></p>
+<p>结果（不叠加玫瑰）：</p>
+<p><img src="/rose_fist/site_images/paper_with_rose.png"></p>
+<h3 id="3-3-输入（剪刀手-scissors）"><a href="#3-3-输入（剪刀手-scissors）" class="headerlink" title="3.3 输入（剪刀手 &#x2F; scissors）"></a>3.3 输入（剪刀手 &#x2F; scissors）</h3><p>原图：</p>
+<p><img src="/rose_fist/assets/scissors_sample.png"></p>
+<p>结果（不叠加玫瑰）：</p>
+<p><img src="/rose_fist/site_images/scissors_with_rose.png"></p>
+<h2 id="4-如何在本地跑-Python-版本"><a href="#4-如何在本地跑-Python-版本" class="headerlink" title="4. 如何在本地跑 Python 版本"></a>4. 如何在本地跑 Python 版本</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> <span class="built_in">source</span>/rose_fist</span><br><span class="line">python3 -m venv .venv</span><br><span class="line">. .venv/bin/activate</span><br><span class="line">pip install -r requirements.txt</span><br><span class="line"></span><br><span class="line">python src/overlay_rose_on_fist.py \</span><br><span class="line">  --input assets/rock_sample.png \</span><br><span class="line">  --output outputs/rock_with_rose.png \</span><br><span class="line">  --rose assets/rose_twemoji.png</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-局限与改进"><a href="#5-局限与改进" class="headerlink" title="5. 局限与改进"></a>5. 局限与改进</h2><ul>
+<li>这是启发式规则：复杂真实场景可能误判（遮挡、角度极端、手套、强背光、多人等）。</li>
+<li>玫瑰放在“掌心中心近似”，不一定是精确的“夹持点”。</li>
+</ul>
+<p>改进方向：</p>
+<ol>
+<li>收集更多握拳样例做阈值统计（precision&#x2F;recall）。</li>
+<li>训练一个轻量分类器：输入 21 点归一化坐标，输出 fist&#x2F;non-fist。</li>
+<li>对玫瑰姿态用更稳定的手掌平面估计，叠加更自然。</li>
+</ol>
+<hr>
+<p>附：更详细的开发过程与 10 次迭代评估记录：</p>
+<ul>
+<li><code>source/rose_fist/docs/process_report.md</code></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://oppoi322.github.io/2026/03/24/rose_fist/" data-id="cuid86pgJFJKB5pnZm6W4-HJH" data-title="rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ComputerVision/" rel="tag">ComputerVision</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Demo/" rel="tag">Demo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MediaPipe/" rel="tag">MediaPipe</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2026/03/23/dl-vision-00-cnn-from-scratch/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">从零开始理解 CNN：卷积（Convolution）、ReLU、池化（Max Pooling）到底在做什么？</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+  
+  <section id="comments" class="utterances">
+    <h2>Comments</h2>
+    <script
+      src="https://utteranc.es/client.js"
+      repo="oppoi322/oppoi322.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Projects/">Projects</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">三月 2026</a><span class="archive-list-count">11</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/03/24/rose_fist/">rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/dl-vision-00-cnn-from-scratch/">从零开始理解 CNN：卷积（Convolution）、ReLU、池化（Max Pooling）到底在做什么？</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/dl-vision-alexnet-repro/">视觉深度学习的分水岭（1）：AlexNet 原文精读 + PyTorch 可复现实现（含结构手绘图）</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 云爪<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>云爪的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="rose_fist demo（网页端）这个 demo 允许你在网页里上传图片：  若识别为“握拳&#x2F;rock&#x2F;fist”，会把玫瑰叠加到手上。 若不是握拳，则不叠加。  实现方式：  纯前端（无后端） 使用 MediaPipe Tasks Vision 的 HandLandmarker 规则与 Python 版本一致：用四指 PIP 角度判断弯曲数量  打开方式：  部署到 Gi">
+<meta property="og:type" content="website">
+<meta property="og:title" content="云爪的博客">
+<meta property="og:url" content="https://oppoi322.github.io/rose_fist/demo/README.html">
+<meta property="og:site_name" content="云爪的博客">
+<meta property="og:description" content="rose_fist demo（网页端）这个 demo 允许你在网页里上传图片：  若识别为“握拳&#x2F;rock&#x2F;fist”，会把玫瑰叠加到手上。 若不是握拳，则不叠加。  实现方式：  纯前端（无后端） 使用 MediaPipe Tasks Vision 的 HandLandmarker 规则与 Python 版本一致：用四指 PIP 角度判断弯曲数量  打开方式：  部署到 Gi">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-24T04:44:36.989Z">
+<meta property="article:modified_time" content="2026-03-24T04:44:36.989Z">
+<meta property="article:author" content="云爪">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="云爪的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">云爪的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://oppoi322.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="page-" class="h-entry article article-type-page" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/rose_fist/demo/README.html" class="article-date">
+  <time class="dt-published" datetime="2026-03-24T04:44:36.989Z" itemprop="datePublished">2026-03-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="rose-fist-demo（网页端）"><a href="#rose-fist-demo（网页端）" class="headerlink" title="rose_fist demo（网页端）"></a>rose_fist demo（网页端）</h1><p>这个 demo 允许你在网页里上传图片：</p>
+<ul>
+<li>若识别为“握拳&#x2F;rock&#x2F;fist”，会把玫瑰叠加到手上。</li>
+<li>若不是握拳，则不叠加。</li>
+</ul>
+<p>实现方式：</p>
+<ul>
+<li>纯前端（无后端）</li>
+<li>使用 MediaPipe Tasks Vision 的 <code>HandLandmarker</code></li>
+<li>规则与 Python 版本一致：用四指 PIP 角度判断弯曲数量</li>
+</ul>
+<p>打开方式：</p>
+<ul>
+<li>部署到 GitHub Pages（在 <code>oppoi322.github.io</code> 上）后，访问：<ul>
+<li><code>/rose_fist/demo/</code></li>
+</ul>
+</li>
+</ul>
+<p>如果本地预览：</p>
+<ul>
+<li>需要一个静态文件服务器（因为浏览器 module + 跨域限制）。例如：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> oppoi322.github.io</span><br><span class="line">npx http-server -p 8080</span><br><span class="line"><span class="comment"># 然后打开 http://localhost:8080/rose_fist/demo/</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://oppoi322.github.io/rose_fist/demo/README.html" data-id="cuidJid26tcOTsx78Eot_QjqD" data-title="" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+  
+</article>
+
+
+
+
+
+  
+  <section id="comments" class="utterances">
+    <h2>Comments</h2>
+    <script
+      src="https://utteranc.es/client.js"
+      repo="oppoi322/oppoi322.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Projects/">Projects</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">三月 2026</a><span class="archive-list-count">11</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/03/24/rose_fist/">rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/dl-vision-00-cnn-from-scratch/">从零开始理解 CNN：卷积（Convolution）、ReLU、池化（Max Pooling）到底在做什么？</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/dl-vision-alexnet-repro/">视觉深度学习的分水岭（1）：AlexNet 原文精读 + PyTorch 可复现实现（含结构手绘图）</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 云爪<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

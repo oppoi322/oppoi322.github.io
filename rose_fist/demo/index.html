@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>云爪的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="rose_fist Demo - 上传图片识别握拳并叠加玫瑰        :root { --w: 920px; }     body { font-family: -apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,Arial,&quot;PingFang SC&quot;,&quot;Hiragino Sans GB&quot;,&quot;Microsoft YaHe">
+<meta property="og:type" content="website">
+<meta property="og:title" content="云爪的博客">
+<meta property="og:url" content="https://oppoi322.github.io/rose_fist/demo/index.html">
+<meta property="og:site_name" content="云爪的博客">
+<meta property="og:description" content="rose_fist Demo - 上传图片识别握拳并叠加玫瑰        :root { --w: 920px; }     body { font-family: -apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,Arial,&quot;PingFang SC&quot;,&quot;Hiragino Sans GB&quot;,&quot;Microsoft YaHe">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-24T04:44:36.990Z">
+<meta property="article:modified_time" content="2026-03-24T04:44:36.990Z">
+<meta property="article:author" content="云爪">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="云爪的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">云爪的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://oppoi322.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="page-" class="h-entry article article-type-page" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/rose_fist/demo/index.html" class="article-date">
+  <time class="dt-published" datetime="2026-03-24T04:44:36.990Z" itemprop="datePublished">2026-03-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>rose_fist Demo - 上传图片识别握拳并叠加玫瑰</title>
+  <style>
+    :root { --w: 920px; }
+    body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; margin: 16px; color: #222; }
+    .wrap { max-width: var(--w); margin: 0 auto; }
+    h1 { font-size: 20px; margin: 8px 0 12px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 12px; background: #fff; }
+    .controls { flex: 1 1 280px; min-width: 280px; }
+    .preview { flex: 2 1 560px; min-width: 320px; }
+    label { display:block; font-size: 13px; color:#444; margin: 10px 0 4px; }
+    input[type="number"] { width: 120px; }
+    input[type="file"] { width: 100%; }
+    button { padding: 8px 10px; border-radius: 8px; border: 1px solid #ccc; background: #f7f7f7; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    canvas { max-width: 100%; height: auto; border-radius: 10px; border: 1px solid #eee; background: #fafafa; }
+    .small { font-size: 12px; color: #666; line-height: 1.45; }
+    pre { white-space: pre-wrap; word-break: break-word; background: #0b1020; color: #e6e6e6; padding: 10px; border-radius: 10px; font-size: 12px; }
+    .ok { color: #0a7; font-weight: 600; }
+    .bad { color: #c33; font-weight: 600; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>rose_fist Demo：上传图片 → 识别“握拳” → 叠加玫瑰</h1>
+
+  <div class="row">
+    <div class="card controls">
+      <label>上传图片（本地文件）</label>
+      <input id="file" type="file" accept="image/*" />
+
+      <label>弯曲角度阈值（PIP angle &lt; 阈值视为弯曲）</label>
+      <input id="thr" type="number" value="160" min="60" max="179" step="1" />
+
+      <label>至少几根手指弯曲才算握拳</label>
+      <input id="need" type="number" value="3" min="1" max="4" step="1" />
+
+      <div style="margin-top: 12px; display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
+        <button id="run" disabled>运行识别并叠加</button>
+        <button id="download" disabled>下载结果 PNG</button>
+      </div>
+
+      <p class="small" style="margin-top: 10px;">
+        说明：本 demo 完全在浏览器端运行（无后端）。首次运行会从 CDN 加载 MediaPipe 模型与 wasm，可能需要几秒。
+      </p>
+
+      <div id="status" class="small">状态：等待上传图片</div>
+      <div id="result" class="small"></div>
+
+      <label>调试信息</label>
+      <pre id="debug">(empty)</pre>
+    </div>
+
+    <div class="card preview">
+      <canvas id="cv"></canvas>
+      <p class="small">提示：如果识别不到手，可以换更清晰的手势图片（光照足、手在画面中央、无遮挡）。</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { FilesetResolver, HandLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+
+  const $ = (id) => document.getElementById(id);
+  const fileEl = $("file");
+  const runBtn = $("run");
+  const dlBtn = $("download");
+  const canvas = $("cv");
+  const ctx = canvas.getContext("2d");
+  const statusEl = $("status");
+  const resultEl = $("result");
+  const debugEl = $("debug");
+
+  const ROSE_URL = "../assets/rose_twemoji.png";
+
+  let inputImageBitmap = null;
+  let roseImg = null;
+  let handLandmarker = null;
+
+  function setStatus(msg) {
+    statusEl.textContent = `状态：${msg}`;
+  }
+
+  function setDebug(obj) {
+    debugEl.textContent = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+  }
+
+  function dist(a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
+  function angleDeg(a, b, c) {
+    // angle ABC
+    const bax = a.x - b.x;
+    const bay = a.y - b.y;
+    const bcx = c.x - b.x;
+    const bcy = c.y - b.y;
+    const dot = bax*bcx + bay*bcy;
+    const denom = (Math.sqrt(bax*bax + bay*bay) * Math.sqrt(bcx*bcx + bcy*bcy)) + 1e-6;
+    let cosv = dot / denom;
+    cosv = Math.max(-1, Math.min(1, cosv));
+    return Math.acos(cosv) * 180 / Math.PI;
+  }
+
+  function classifyFist(points, thr, need) {
+    const fingers = {
+      index: { mcp: 5, pip: 6, tip: 8 },
+      middle:{ mcp: 9, pip:10, tip:12 },
+      ring:  { mcp:13, pip:14, tip:16 },
+      pinky: { mcp:17, pip:18, tip:20 },
+    };
+    const angles = {};
+    const curled = {};
+    let curledCount = 0;
+    for (const [k, v] of Object.entries(fingers)) {
+      const ang = angleDeg(points[v.mcp], points[v.pip], points[v.tip]);
+      angles[k] = Math.round(ang * 10) / 10;
+      curled[k] = ang < thr;
+      if (curled[k]) curledCount++;
+    }
+    return {
+      isFist: curledCount >= need,
+      angles,
+      curled,
+      curledCount,
+      thr,
+      need,
+    };
+  }
+
+  function palmPose(points, width, height) {
+    // palm center approx = mean(wrist + MCPs)
+    const idx = [0, 5, 9, 13, 17];
+    let x = 0, y = 0;
+    for (const i of idx) { x += points[i].x; y += points[i].y; }
+    x /= idx.length; y /= idx.length;
+
+    // bbox for size
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const p of points) {
+      x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y);
+      x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y);
+    }
+    const handSize = Math.max(x1 - x0, y1 - y0);
+    const size = Math.max(32, Math.min(0.9 * handSize, 0.8 * Math.min(width, height)));
+
+    // rotation from wrist->middle_mcp
+    const wrist = points[0];
+    const mid = points[9];
+    const rot = Math.atan2(mid.y - wrist.y, mid.x - wrist.x) * 180 / Math.PI;
+
+    return { cx: x, cy: y, size, rot };
+  }
+
+  async function ensureModels() {
+    if (handLandmarker) return;
+
+    setStatus("加载 MediaPipe wasm + hand_landmarker 模型...（首次较慢）");
+    const vision = await FilesetResolver.forVisionTasks(
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+    );
+
+    // official hosted model (CORS ok in general). If fails, user will see error.
+    const modelUrl = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task";
+
+    handLandmarker = await HandLandmarker.createFromOptions(vision, {
+      baseOptions: {
+        modelAssetPath: modelUrl,
+      },
+      runningMode: "IMAGE",
+      numHands: 1,
+    });
+
+    roseImg = new Image();
+    roseImg.crossOrigin = "anonymous";
+    roseImg.src = ROSE_URL;
+    await roseImg.decode();
+
+    setStatus("模型加载完成");
+  }
+
+  function drawBase() {
+    canvas.width = inputImageBitmap.width;
+    canvas.height = inputImageBitmap.height;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(inputImageBitmap, 0, 0);
+  }
+
+  async function runOnce() {
+    if (!inputImageBitmap) return;
+
+    runBtn.disabled = true;
+    dlBtn.disabled = true;
+    resultEl.textContent = "";
+    setDebug("(running)");
+
+    try {
+      await ensureModels();
+      setStatus("识别中...");
+
+      drawBase();
+
+      const det = handLandmarker.detect(inputImageBitmap);
+      const landmarks = det.landmarks?.[0];
+      if (!landmarks) {
+        setStatus("未检测到手");
+        resultEl.innerHTML = '<span class="bad">未检测到手</span>';
+        setDebug(det);
+        return;
+      }
+
+      // Convert normalized coords to pixel points
+      const pts = landmarks.map((p) => ({ x: p.x * canvas.width, y: p.y * canvas.height }));
+
+      const thr = Number($("thr").value);
+      const need = Number($("need").value);
+      const cls = classifyFist(pts, thr, need);
+
+      // show info
+      resultEl.innerHTML = cls.isFist
+        ? '<span class="ok">判定：握拳（已叠加玫瑰）</span>'
+        : '<span class="bad">判定：非握拳（不叠加玫瑰）</span>';
+
+      if (cls.isFist) {
+        const pose = palmPose(pts, canvas.width, canvas.height);
+
+        // Draw rose with rotation about its center
+        const scale = pose.size / Math.max(roseImg.width, roseImg.height);
+        const w = roseImg.width * scale;
+        const h = roseImg.height * scale;
+
+        ctx.save();
+        ctx.translate(pose.cx, pose.cy);
+        ctx.rotate(pose.rot * Math.PI / 180);
+        ctx.drawImage(roseImg, -w/2, -h/2, w, h);
+        ctx.restore();
+      }
+
+      setStatus("完成");
+      setDebug({
+        fist: cls,
+        handedness: det.handedness?.[0] ?? null,
+      });
+
+      dlBtn.disabled = false;
+    } catch (e) {
+      console.error(e);
+      setStatus("失败：" + (e?.message || String(e)));
+      resultEl.innerHTML = '<span class="bad">运行失败</span>';
+      setDebug(String(e?.stack || e));
+    } finally {
+      runBtn.disabled = false;
+    }
+  }
+
+  fileEl.addEventListener("change", async () => {
+    const f = fileEl.files?.[0];
+    if (!f) return;
+
+    setStatus("读取图片...");
+    inputImageBitmap = await createImageBitmap(f);
+    drawBase();
+    runBtn.disabled = false;
+    dlBtn.disabled = true;
+    resultEl.textContent = "";
+    setDebug("(ready)");
+    setStatus("已加载图片，点击“运行识别并叠加”");
+  });
+
+  runBtn.addEventListener("click", runOnce);
+
+  dlBtn.addEventListener("click", () => {
+    const a = document.createElement("a");
+    a.download = "rose_fist_result.png";
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+  });
+</script>
+</body>
+</html>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://oppoi322.github.io/rose_fist/demo/index.html" data-id="cuidFjL58Mks9-KFP_dwIX1MG" data-title="" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+  
+</article>
+
+
+
+
+
+  
+  <section id="comments" class="utterances">
+    <h2>Comments</h2>
+    <script
+      src="https://utteranc.es/client.js"
+      repo="oppoi322/oppoi322.github.io"
+      issue-term="pathname"
+      theme="github-light"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Projects/">Projects</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%9A%8F%E7%AC%94/">随笔</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/03/">三月 2026</a><span class="archive-list-count">11</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/03/24/rose_fist/">rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/dl-vision-00-cnn-from-scratch/">从零开始理解 CNN：卷积（Convolution）、ReLU、池化（Max Pooling）到底在做什么？</a>
+          </li>
+        
+          <li>
+            <a href="/2026/03/23/dl-vision-alexnet-repro/">视觉深度学习的分水岭（1）：AlexNet 原文精读 + PyTorch 可复现实现（含结构手绘图）</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 云爪<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
