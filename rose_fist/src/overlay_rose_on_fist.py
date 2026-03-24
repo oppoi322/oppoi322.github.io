@@ -88,15 +88,13 @@ def load_rgba(path: str) -> np.ndarray:
 def split_rose_stem_flower(rose_rgba: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Split a rose RGBA into (stem_rgba, flower_rgba).
 
-    For *photo cutouts* we don't have clean colors; but the requirement is:
-    - green stem/leaves should be "inside" the fist
-    - red flower should be outside
+    Heuristic split for *photo cutouts*:
+    - stem: green-ish pixels, slightly dilated to keep a bit of green near the flower base
+    - flower: red-ish pixels (fallback: non-green)
 
-    We still use HSV thresholding:
-    - stem = green-ish
-    - flower = red-ish + non-green (fallback)
-
-    This is heuristic and works best when the rose has clear green stem.
+    Notes
+    - This is intentionally permissive for stem so we can leave small green bits visible
+      near the flower bottom and on both sides of the fist after occlusion.
     """
     rgba = rose_rgba.copy()
     rgb = rgba[..., :3]
@@ -108,12 +106,21 @@ def split_rose_stem_flower(rose_rgba: np.ndarray) -> tuple[np.ndarray, np.ndarra
     mask_alpha = a > 0
 
     # green range (tunable)
-    green = cv2.inRange(hsv, (35, 40, 40), (95, 255, 255)).astype(bool) & mask_alpha
+    green0 = cv2.inRange(hsv, (35, 35, 35), (95, 255, 255)).astype(bool) & mask_alpha
 
     # red ranges (wrap-around hue)
     red1 = cv2.inRange(hsv, (0, 60, 60), (10, 255, 255)).astype(bool)
     red2 = cv2.inRange(hsv, (170, 60, 60), (180, 255, 255)).astype(bool)
     red = (red1 | red2) & mask_alpha
+
+    # Dilate green a bit (but don't spill into red) to keep stem continuity near flower base
+    h, w = rgba.shape[:2]
+    k = max(3, int(0.01 * max(h, w)))
+    if k % 2 == 0:
+        k += 1
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))
+    green_d = cv2.dilate(green0.astype(np.uint8) * 255, kernel, iterations=1) > 0
+    green = (green0 | (green_d & (~red))) & mask_alpha
 
     stem = rgba.copy()
     flower = rgba.copy()
@@ -263,11 +270,23 @@ def extend_stem_rgba(stem_rgba: np.ndarray, extend_factor: float = 1.8) -> np.nd
     return resized
 
 
-def fist_occlusion_mask_from_bbox(img_shape: Tuple[int, int], pts_xy: np.ndarray) -> np.ndarray:
+def fist_occlusion_mask_from_bbox(
+    img_shape: Tuple[int, int],
+    pts_xy: np.ndarray,
+    erode_ratio: float = 0.10,
+    keep_bottom_frac: float = 0.12,
+    keep_side_frac: float = 0.06,
+) -> np.ndarray:
     """Create an approximate occlusion mask for the fist region.
 
-    This is a *heuristic* that uses the landmarks bbox as the hand area.
-    We erode it a bit to simulate the interior part of the fist that should occlude the stem.
+    We use the landmarks bbox as the hand area, then erode to approximate the
+    *interior* of the fist.
+
+    To satisfy the new visual requirement (leave a tiny bit of green stem visible
+    under the flower and also a tiny bit on the pinky side), we intentionally
+    *remove* thin margins from the occlusion mask:
+      - keep_bottom_frac: leave some pixels at bbox bottom un-occluded
+      - keep_side_frac: leave some pixels at bbox left/right un-occluded
 
     Returns uint8 mask 0/255.
     """
@@ -280,12 +299,26 @@ def fist_occlusion_mask_from_bbox(img_shape: Tuple[int, int], pts_xy: np.ndarray
     mask = np.zeros((H, W), dtype=np.uint8)
     cv2.rectangle(mask, (x0, y0), (x1, y1), 255, thickness=-1)
 
-    # erode to get inner region (more conservative)
-    k = max(3, int(0.08 * max(x1 - x0, y1 - y0)))
+    # erode to get inner region
+    k = max(3, int(erode_ratio * max(x1 - x0, y1 - y0)))
     if k % 2 == 0:
         k += 1
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))
     mask = cv2.erode(mask, kernel, iterations=1)
+
+    # carve out bottom margin (so a small bit of stem can show under the flower)
+    bh = int(max(1, keep_bottom_frac * (y1 - y0)))
+    if bh > 0:
+        yb0 = max(0, y1 - bh)
+        mask[yb0 : y1 + 1, :] = 0
+
+    # carve out side margins (so a bit of stem can show on both sides)
+    sw = int(max(1, keep_side_frac * (x1 - x0)))
+    if sw > 0:
+        xl1 = min(W, x0 + sw)
+        xr0 = max(0, x1 - sw)
+        mask[:, x0:xl1] = 0
+        mask[:, xr0 : x1 + 1] = 0
 
     return mask
 
@@ -342,37 +375,43 @@ def process_image(input_path: str, output_path: str, rose_path: str, cfg: FistHe
         # Make stem longer (requirement: longer green stem)
         stem_rgba0 = extend_stem_rgba(stem_rgba0, extend_factor=1.9)
 
-        # Rotation requirement: flower should point towards the thumb direction.
-        # Compute: desired_dir (thumb) - current_dir (flower direction in rose image)
-        # so that after rotation, flower vector aligns with thumb vector.
+        # Compute flower direction in the rose image (from stem anchor to flower centroid)
         stem_anchor0 = find_anchor_bottom(stem_rgba0)
         flower_dir0 = flower_direction_deg_in_image(flower_rgba0, stem_anchor0)
-        # Requirement 1: rose direction is perpendicular (90°) to fist direction.
-        # Let fist_dir be wrist->middle_mcp. We want the rose main axis to be fist_dir + 90°.
+
+        # Requirement 1: rose axis ⟂ fist direction.
+        # fist_dir is wrist->middle_mcp. Candidate axes are fist_dir ± 90.
         fist_dir = fist_direction_deg(pts)
-        rose_axis = fist_dir + 90.0
+        axes = [fist_dir + 90.0, fist_dir - 90.0]
 
-        # Requirement 2: flower should be on the thumb side.
-        # We align the flower direction along rose_axis, then choose +/- 180° if it lands on the wrong side.
-        thumb_dir = thumb_direction_deg(pts)
-
-        # First, align flower direction to rose_axis.
-        rot = rose_axis - flower_dir0
-
-        # Check which side the flower ends up on relative to the fist direction.
-        # Define axis v=fist_dir unit; thumb side sign uses palm->thumb.
+        # Requirement 2: flower must be on the thumb side.
+        # Determine thumb side relative to fist axis (cross sign).
         palm = palm_center_xy(pts)
-        wrist = pts[0]
         v = np.array([np.cos(np.radians(fist_dir)), np.sin(np.radians(fist_dir))], dtype=np.float32)
         thumb_vec = pts[4] - palm
         thumb_side = side_of_vector(v, thumb_vec)
 
-        # Estimate flower vector after rotation using angle math (in overlay space).
-        # We only need side: take rose_axis direction as where flower points.
+        # Choose axis whose direction is closer to thumb direction (same half-plane).
+        thumb_dir = thumb_direction_deg(pts)
+        thumb_unit = np.array([np.cos(np.radians(thumb_dir)), np.sin(np.radians(thumb_dir))], dtype=np.float32)
+
+        best_axis = axes[0]
+        best_score = -1e9
+        for ax in axes:
+            u = np.array([np.cos(np.radians(ax)), np.sin(np.radians(ax))], dtype=np.float32)
+            score = float(np.dot(u, thumb_unit))
+            if score > best_score:
+                best_score = score
+                best_axis = ax
+
+        rose_axis = best_axis
+
+        # Align flower direction to chosen rose_axis.
+        rot = rose_axis - flower_dir0
+
+        # Final safety: ensure flower side matches thumb side; flip 180 if not.
         flower_vec = np.array([np.cos(np.radians(rose_axis)), np.sin(np.radians(rose_axis))], dtype=np.float32)
         flower_side = side_of_vector(v, flower_vec)
-
-        # If flower is not on the same side as thumb, flip 180°.
         if thumb_side * flower_side < 0:
             rot += 180.0
 
