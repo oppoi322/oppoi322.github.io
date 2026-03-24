@@ -163,15 +163,13 @@ def alpha_blend_rgba(bg_bgr: np.ndarray, fg_rgba: np.ndarray, x: int, y: int) ->
     return out
 
 
-def rose_overlay_pose(pts_xy: np.ndarray, image_shape: Tuple[int, int]) -> Tuple[Tuple[int, int], int, float]:
+def rose_overlay_pose(pts_xy: np.ndarray, image_shape: Tuple[int, int]) -> Tuple[Tuple[int, int], int]:
     """Heuristic placement for holding a rose.
 
     Returns:
-      center (cx,cy), size_px, rotation_deg
+      anchor position (cx,cy) in pixels, and size_px.
 
-    Uses palm center approximated by average of wrist + MCPs.
-    Size is based on hand bbox.
-    Rotation is based on wrist->middle_mcp direction.
+    Rotation is computed separately (to align flower towards thumb).
     """
     H, W = image_shape
     wrist = pts_xy[0]
@@ -187,13 +185,49 @@ def rose_overlay_pose(pts_xy: np.ndarray, image_shape: Tuple[int, int]) -> Tuple
     # rose roughly the palm size; slightly larger for better illusion
     size_px = int(max(32, min(1.05 * hand_size, 0.9 * min(W, H))))
 
-    # rotation: align with forearm direction
-    middle_mcp = pts_xy[9]
-    v = middle_mcp - wrist
-    rot = float(np.degrees(np.arctan2(v[1], v[0])))
-
     cx, cy = int(palm[0]), int(palm[1])
-    return (cx, cy), size_px, rot
+    return (cx, cy), size_px
+
+
+def thumb_direction_deg(pts_xy: np.ndarray) -> float:
+    """Direction (degrees) from palm center towards thumb tip."""
+    wrist = pts_xy[0]
+    mcps = pts_xy[[5, 9, 13, 17]]
+    palm = np.mean(np.vstack([wrist, mcps]), axis=0)
+    thumb_tip = pts_xy[4]
+    v = thumb_tip - palm
+    return float(np.degrees(np.arctan2(v[1], v[0])))
+
+
+def flower_direction_deg_in_image(rose_flower_rgba: np.ndarray, stem_anchor_xy: tuple[int, int]) -> float:
+    """Compute the direction from stem anchor to flower centroid in the rose image."""
+    alpha = rose_flower_rgba[..., 3]
+    ys, xs = np.where(alpha > 0)
+    if len(xs) == 0:
+        # default: up
+        return -90.0
+    cx = float(xs.mean())
+    cy = float(ys.mean())
+    ax, ay = stem_anchor_xy
+    v = np.array([cx - ax, cy - ay], dtype=np.float32)
+    return float(np.degrees(np.arctan2(v[1], v[0])))
+
+
+def extend_stem_rgba(stem_rgba: np.ndarray, extend_factor: float = 1.8) -> np.ndarray:
+    """Make the green stem longer by stretching it mainly in Y.
+
+    This helps satisfy "longer green stem" requirement even when the source asset is short.
+    """
+    if extend_factor <= 1.0:
+        return stem_rgba
+    h, w = stem_rgba.shape[:2]
+    new_h = int(h * extend_factor)
+    if new_h <= h:
+        return stem_rgba
+
+    # Scale Y more than X; keep width.
+    resized = cv2.resize(stem_rgba, (w, new_h), interpolation=cv2.INTER_LINEAR)
+    return resized
 
 
 def fist_occlusion_mask_from_bbox(img_shape: Tuple[int, int], pts_xy: np.ndarray) -> np.ndarray:
@@ -267,10 +301,22 @@ def process_image(input_path: str, output_path: str, rose_path: str, cfg: FistHe
     out = img.copy()
     if is_fist:
         rose_rgba = load_rgba(rose_path)
-        (cx, cy), size_px, rot = rose_overlay_pose(pts, out.shape[:2])
+        (cx, cy), size_px = rose_overlay_pose(pts, out.shape[:2])
 
         # Prepare rose layers: stem (green) and flower (non-green)
         stem_rgba0, flower_rgba0 = split_rose_stem_flower(rose_rgba)
+
+        # Make stem longer (requirement: longer green stem)
+        stem_rgba0 = extend_stem_rgba(stem_rgba0, extend_factor=1.9)
+
+        # Rotation requirement: flower should point towards the thumb direction.
+        # Compute: desired_dir (thumb) - current_dir (flower direction in rose image)
+        # so that after rotation, flower vector aligns with thumb vector.
+        stem_anchor0 = find_anchor_bottom(stem_rgba0)
+        flower_dir0 = flower_direction_deg_in_image(flower_rgba0, stem_anchor0)
+        desired = thumb_direction_deg(pts)
+        rot = desired - flower_dir0
+
         stem_rgba = rotate_and_resize_rgba(stem_rgba0, size_px=size_px, rotation_deg=rot)
         flower_rgba = rotate_and_resize_rgba(flower_rgba0, size_px=size_px, rotation_deg=rot)
 

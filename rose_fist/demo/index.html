@@ -13,8 +13,8 @@
 <meta property="og:site_name" content="云爪的博客">
 <meta property="og:description" content="rose_fist Demo - 上传图片识别握拳并叠加玫瑰        :root { --w: 920px; }     body { font-family: -apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,Arial,&quot;PingFang SC&quot;,&quot;Hiragino Sans GB&quot;,&quot;Microsoft YaHe">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-03-24T05:05:14.431Z">
-<meta property="article:modified_time" content="2026-03-24T05:05:14.431Z">
+<meta property="article:published_time" content="2026-03-24T05:53:07.495Z">
+<meta property="article:modified_time" content="2026-03-24T05:53:07.495Z">
 <meta property="article:author" content="云爪">
 <meta name="twitter:card" content="summary">
   
@@ -80,7 +80,7 @@
         <section id="main"><article id="page-" class="h-entry article article-type-page" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/rose_fist/demo/index.html" class="article-date">
-  <time class="dt-published" datetime="2026-03-24T05:05:14.431Z" itemprop="datePublished">2026-03-24</time>
+  <time class="dt-published" datetime="2026-03-24T05:53:07.495Z" itemprop="datePublished">2026-03-24</time>
 </a>
     
   </div>
@@ -167,7 +167,8 @@
   const resultEl = $("result");
   const debugEl = $("debug");
 
-  const ROSE_URL = "../assets/rose_twemoji.png";
+  // default rose: FluentUI Emoji (bigger + clearer, and stem is longer-looking)
+  const ROSE_URL = "../assets/rose_fluent.png";
 
   let inputImageBitmap = null;
   let roseImg = null;
@@ -323,12 +324,12 @@
         const pose = palmPose(pts, canvas.width, canvas.height);
 
         // "Held" illusion (simple version in browser):
-        // 1) draw stem anchored near palm
-        // 2) redraw a fist-area patch (cropped from original) to occlude stem
-        // 3) draw flower slightly above so it stays outside
+        // 1) draw the rose anchored so that the lower part goes into the fist
+        // 2) redraw a fist-area patch (cropped from original) to occlude the stem
         //
-        // Here we approximate "stem" by drawing full rose but with a vertical offset
-        // and then occluding the center using a cropped hand bbox from the original.
+        // Requirement: the flower should be towards the thumb direction.
+        // In browser we approximate by using MediaPipe's pose.rot (hand direction),
+        // while the Python version aligns precisely using thumb tip vector.
 
         // compute bbox from landmarks
         let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -343,9 +344,20 @@
         const h = roseImg.height * scale;
 
         // Step A: draw rose (stem+flower) but anchored so that lower part goes into fist
+        // Align flower towards thumb direction (approx):
+        // assume rose points "up" in its native image.
+        const wrist = pts[0];
+        const palm = {
+          x: (pts[0].x + pts[5].x + pts[9].x + pts[13].x + pts[17].x) / 5,
+          y: (pts[0].y + pts[5].y + pts[9].y + pts[13].y + pts[17].y) / 5,
+        };
+        const thumb = pts[4];
+        const thumbDir = Math.atan2(thumb.y - palm.y, thumb.x - palm.x); // radians
+        const rot = thumbDir + Math.PI / 2; // because "up" is -90deg
+
         ctx.save();
         ctx.translate(pose.cx, pose.cy);
-        ctx.rotate(pose.rot * Math.PI / 180);
+        ctx.rotate(rot);
         // move rose upward so flower tends to be outside
         ctx.drawImage(roseImg, -w/2, -h*0.85, w, h);
         ctx.restore();
@@ -410,7 +422,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://oppoi322.github.io/rose_fist/demo/index.html" data-id="cuid_AN7FOY9gIIAutodnX4YZ" data-title="" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://oppoi322.github.io/rose_fist/demo/index.html" data-id="cuida4ZRucmD4WyyAaZk_EuAC" data-title="" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
