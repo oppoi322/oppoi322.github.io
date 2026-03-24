@@ -71,7 +71,17 @@ categories:
 
 ![](/rose_fist/site_images/rock_with_real_rose.png)
 
-（本次使用“真实照片 + GrabCut 自动抠图”的玫瑰 cutout 做测试素材：图片来源为 picsum 的 seed=4 随机照片，用于展示管线；若需要指定真实玫瑰照片来源，可替换输入图再生成 cutout。）
+玫瑰原始照片（抠图前）：
+
+![](/rose_fist/assets/rose_photo_source.jpg)
+
+抠图后的透明 PNG（用于叠加）：
+
+![](/rose_fist/assets/rose_real_cutout.png)
+
+（本次使用“真实玫瑰照片 + GrabCut 自动抠图”的 cutout 做测试素材：
+- 来源：eXternOS-Base 仓库内的 `legacy/yellow-rose.jpg`（真实玫瑰照片，非卡通）
+- 抠图：`src/grabcut_cutout.py` 自动生成 `assets/rose_real_cutout.png`）
 
 （对比：之前“仅花朝向大拇指”的版本）
 
