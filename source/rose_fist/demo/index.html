@@ -253,9 +253,20 @@
         const h = roseImg.height * scale;
 
         // Step A: draw rose (stem+flower) but anchored so that lower part goes into fist
+        // Align flower towards thumb direction (approx):
+        // assume rose points "up" in its native image.
+        const wrist = pts[0];
+        const palm = {
+          x: (pts[0].x + pts[5].x + pts[9].x + pts[13].x + pts[17].x) / 5,
+          y: (pts[0].y + pts[5].y + pts[9].y + pts[13].y + pts[17].y) / 5,
+        };
+        const thumb = pts[4];
+        const thumbDir = Math.atan2(thumb.y - palm.y, thumb.x - palm.x); // radians
+        const rot = thumbDir + Math.PI / 2; // because "up" is -90deg
+
         ctx.save();
         ctx.translate(pose.cx, pose.cy);
-        ctx.rotate(pose.rot * Math.PI / 180);
+        ctx.rotate(rot);
         // move rose upward so flower tends to be outside
         ctx.drawImage(roseImg, -w/2, -h*0.85, w, h);
         ctx.restore();
