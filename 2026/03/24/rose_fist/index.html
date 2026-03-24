@@ -6,14 +6,15 @@
   
   <title>rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo） | 云爪的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="这篇文章介绍我做的 rose_fist 小项目：  当图片中检测到 握拳（fist&#x2F;rock） 时，在拳头（掌心位置附近）叠加一朵玫瑰 PNG，让它看起来像“手里握着玫瑰”。 同时提供一个 网页端 Demo：可以在文章网页中上传图片，直接看到效果。  项目源码在本仓库：source&#x2F;rose_fist&#x2F;。 1. 在线 Demo打开：&#x2F;rose_fist&#x2F;demo&amp;#x">
+  <meta name="description" content="这篇文章介绍我做的 rose_fist 小项目（已升级为“真实玫瑰照片抠图 + 握持遮挡 + 方向约束”）：  当图片中检测到 握拳（fist&#x2F;rock） 时，在拳头（掌心位置附近）叠加一朵玫瑰 PNG，让它看起来像“手里握着玫瑰”。 同时提供一个 网页端 Demo：可以在文章网页中上传图片，直接看到效果。  项目源码在本仓库：source&#x2F;rose_fist&#x2F;。 1. 在线 Demo打">
 <meta property="og:type" content="article">
 <meta property="og:title" content="rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）">
 <meta property="og:url" content="https://oppoi322.github.io/2026/03/24/rose_fist/index.html">
 <meta property="og:site_name" content="云爪的博客">
-<meta property="og:description" content="这篇文章介绍我做的 rose_fist 小项目：  当图片中检测到 握拳（fist&#x2F;rock） 时，在拳头（掌心位置附近）叠加一朵玫瑰 PNG，让它看起来像“手里握着玫瑰”。 同时提供一个 网页端 Demo：可以在文章网页中上传图片，直接看到效果。  项目源码在本仓库：source&#x2F;rose_fist&#x2F;。 1. 在线 Demo打开：&#x2F;rose_fist&#x2F;demo&amp;#x">
+<meta property="og:description" content="这篇文章介绍我做的 rose_fist 小项目（已升级为“真实玫瑰照片抠图 + 握持遮挡 + 方向约束”）：  当图片中检测到 握拳（fist&#x2F;rock） 时，在拳头（掌心位置附近）叠加一朵玫瑰 PNG，让它看起来像“手里握着玫瑰”。 同时提供一个 网页端 Demo：可以在文章网页中上传图片，直接看到效果。  项目源码在本仓库：source&#x2F;rose_fist&#x2F;。 1. 在线 Demo打">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/assets/rock_sample.png">
+<meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/rock_with_real_rose.png">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/rock_with_rose_held_thumb_fluent.png">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/rock_with_rose_held_thumb_twemoji.png">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/rock_with_rose.png">
@@ -22,7 +23,7 @@
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/assets/scissors_sample.png">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/scissors_with_rose.png">
 <meta property="article:published_time" content="2026-03-24T04:45:00.000Z">
-<meta property="article:modified_time" content="2026-03-24T05:53:07.481Z">
+<meta property="article:modified_time" content="2026-03-24T08:39:35.022Z">
 <meta property="article:author" content="云爪">
 <meta property="article:tag" content="ComputerVision">
 <meta property="article:tag" content="Demo">
@@ -115,7 +116,7 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <p>这篇文章介绍我做的 <strong>rose_fist</strong> 小项目：</p>
+        <p>这篇文章介绍我做的 <strong>rose_fist</strong> 小项目（已升级为“真实玫瑰照片抠图 + 握持遮挡 + 方向约束”）：</p>
 <ul>
 <li>当图片中检测到 <strong>握拳（fist&#x2F;rock）</strong> 时，在拳头（掌心位置附近）叠加一朵玫瑰 PNG，让它看起来像“手里握着玫瑰”。</li>
 <li>同时提供一个 <strong>网页端 Demo</strong>：可以在文章网页中上传图片，直接看到效果。</li>
@@ -152,10 +153,15 @@
 <h2 id="3-测试图片与最终效果（必须可见）"><a href="#3-测试图片与最终效果（必须可见）" class="headerlink" title="3. 测试图片与最终效果（必须可见）"></a>3. 测试图片与最终效果（必须可见）</h2><p>我选用了 Rock&#x2F;Paper&#x2F;Scissors 数据示例图做测试：</p>
 <h3 id="3-1-输入（握拳-rock）"><a href="#3-1-输入（握拳-rock）" class="headerlink" title="3.1 输入（握拳 &#x2F; rock）"></a>3.1 输入（握拳 &#x2F; rock）</h3><p>原图：</p>
 <p><img src="/rose_fist/assets/rock_sample.png"></p>
-<p>结果（叠加玫瑰：模拟“握住枝条，花朵在外”，并让花朵朝向大拇指方向）：</p>
-<ul>
-<li>FluentUI Emoji（玫瑰枝条相对更长）：</li>
-</ul>
+<p>结果（叠加玫瑰：</p>
+<ol>
+<li>玫瑰主方向与拳头方向 <strong>垂直（90°）</strong></li>
+<li>花朵在 <strong>大拇指那一侧</strong></li>
+<li>枝条被手握住（遮挡））：</li>
+</ol>
+<p><img src="/rose_fist/site_images/rock_with_real_rose.png"></p>
+<p>（本次使用“真实照片 + GrabCut 自动抠图”的玫瑰 cutout 做测试素材：图片来源为 picsum 的 seed&#x3D;4 随机照片，用于展示管线；若需要指定真实玫瑰照片来源，可替换输入图再生成 cutout。）</p>
+<p>（对比：之前“仅花朝向大拇指”的版本）</p>
 <p><img src="/rose_fist/site_images/rock_with_rose_held_thumb_fluent.png"></p>
 <ul>
 <li>Twemoji（对比）：</li>
@@ -192,7 +198,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://oppoi322.github.io/2026/03/24/rose_fist/" data-id="cuidC_3Ld38u5xlt_9Eq8xFRL" data-title="rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://oppoi322.github.io/2026/03/24/rose_fist/" data-id="cuidfri5Nssze5U-zCaGVzKVt" data-title="rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
