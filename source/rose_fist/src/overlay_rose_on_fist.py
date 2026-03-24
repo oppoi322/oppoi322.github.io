@@ -88,32 +88,44 @@ def load_rgba(path: str) -> np.ndarray:
 def split_rose_stem_flower(rose_rgba: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Split a rose RGBA into (stem_rgba, flower_rgba).
 
-    We treat "green-ish" pixels as stem/leaves, and the rest as flower.
-    This is a heuristic that works well for emoji-style roses (e.g. Twemoji).
+    For *photo cutouts* we don't have clean colors; but the requirement is:
+    - green stem/leaves should be "inside" the fist
+    - red flower should be outside
+
+    We still use HSV thresholding:
+    - stem = green-ish
+    - flower = red-ish + non-green (fallback)
+
+    This is heuristic and works best when the rose has clear green stem.
     """
     rgba = rose_rgba.copy()
-    rgb = rgba[..., :3].astype(np.float32)
-    a = rgba[..., 3:4].astype(np.float32)
+    rgb = rgba[..., :3]
+    a = rgba[..., 3]
 
-    # Convert to HSV-ish via OpenCV for robust green detection.
     bgr = rgb[..., ::-1].astype(np.uint8)
     hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
 
+    mask_alpha = a > 0
+
     # green range (tunable)
-    lower = np.array([35, 40, 40], dtype=np.uint8)
-    upper = np.array([95, 255, 255], dtype=np.uint8)
-    green_mask = cv2.inRange(hsv, lower, upper).astype(bool)
+    green = cv2.inRange(hsv, (35, 40, 40), (95, 255, 255)).astype(bool) & mask_alpha
+
+    # red ranges (wrap-around hue)
+    red1 = cv2.inRange(hsv, (0, 60, 60), (10, 255, 255)).astype(bool)
+    red2 = cv2.inRange(hsv, (170, 60, 60), (180, 255, 255)).astype(bool)
+    red = (red1 | red2) & mask_alpha
 
     stem = rgba.copy()
     flower = rgba.copy()
 
-    # Stem keeps only green pixels
-    stem_alpha = (a[..., 0] > 0) & green_mask
-    stem[..., 3] = np.where(stem_alpha, stem[..., 3], 0)
+    stem[..., 3] = np.where(green, stem[..., 3], 0)
 
-    # Flower keeps everything except green pixels
-    flower_alpha = (a[..., 0] > 0) & (~green_mask)
-    flower[..., 3] = np.where(flower_alpha, flower[..., 3], 0)
+    # flower keeps red pixels; if red is too small (e.g. yellow rose), fallback to non-green
+    if red.sum() < 0.01 * mask_alpha.sum():
+        keep = (~green) & mask_alpha
+    else:
+        keep = red
+    flower[..., 3] = np.where(keep, flower[..., 3], 0)
 
     return stem, flower
 
@@ -189,14 +201,34 @@ def rose_overlay_pose(pts_xy: np.ndarray, image_shape: Tuple[int, int]) -> Tuple
     return (cx, cy), size_px
 
 
-def thumb_direction_deg(pts_xy: np.ndarray) -> float:
-    """Direction (degrees) from palm center towards thumb tip."""
+def palm_center_xy(pts_xy: np.ndarray) -> np.ndarray:
     wrist = pts_xy[0]
     mcps = pts_xy[[5, 9, 13, 17]]
-    palm = np.mean(np.vstack([wrist, mcps]), axis=0)
+    return np.mean(np.vstack([wrist, mcps]), axis=0)
+
+
+def thumb_direction_deg(pts_xy: np.ndarray) -> float:
+    """Direction (degrees) from palm center towards thumb tip."""
+    palm = palm_center_xy(pts_xy)
     thumb_tip = pts_xy[4]
     v = thumb_tip - palm
     return float(np.degrees(np.arctan2(v[1], v[0])))
+
+
+def fist_direction_deg(pts_xy: np.ndarray) -> float:
+    """Approx forearm/hand direction in image (degrees).
+
+    Uses wrist -> middle_mcp.
+    """
+    wrist = pts_xy[0]
+    middle_mcp = pts_xy[9]
+    v = middle_mcp - wrist
+    return float(np.degrees(np.arctan2(v[1], v[0])))
+
+
+def side_of_vector(v: np.ndarray, p: np.ndarray) -> float:
+    """2D cross product z-value: v x p."""
+    return float(v[0] * p[1] - v[1] * p[0])
 
 
 def flower_direction_deg_in_image(rose_flower_rgba: np.ndarray, stem_anchor_xy: tuple[int, int]) -> float:
@@ -217,6 +249,8 @@ def extend_stem_rgba(stem_rgba: np.ndarray, extend_factor: float = 1.8) -> np.nd
     """Make the green stem longer by stretching it mainly in Y.
 
     This helps satisfy "longer green stem" requirement even when the source asset is short.
+
+    Note: for photo cutouts this can introduce artifacts, so we keep it mild.
     """
     if extend_factor <= 1.0:
         return stem_rgba
@@ -225,7 +259,6 @@ def extend_stem_rgba(stem_rgba: np.ndarray, extend_factor: float = 1.8) -> np.nd
     if new_h <= h:
         return stem_rgba
 
-    # Scale Y more than X; keep width.
     resized = cv2.resize(stem_rgba, (w, new_h), interpolation=cv2.INTER_LINEAR)
     return resized
 
@@ -314,8 +347,34 @@ def process_image(input_path: str, output_path: str, rose_path: str, cfg: FistHe
         # so that after rotation, flower vector aligns with thumb vector.
         stem_anchor0 = find_anchor_bottom(stem_rgba0)
         flower_dir0 = flower_direction_deg_in_image(flower_rgba0, stem_anchor0)
-        desired = thumb_direction_deg(pts)
-        rot = desired - flower_dir0
+        # Requirement 1: rose direction is perpendicular (90°) to fist direction.
+        # Let fist_dir be wrist->middle_mcp. We want the rose main axis to be fist_dir + 90°.
+        fist_dir = fist_direction_deg(pts)
+        rose_axis = fist_dir + 90.0
+
+        # Requirement 2: flower should be on the thumb side.
+        # We align the flower direction along rose_axis, then choose +/- 180° if it lands on the wrong side.
+        thumb_dir = thumb_direction_deg(pts)
+
+        # First, align flower direction to rose_axis.
+        rot = rose_axis - flower_dir0
+
+        # Check which side the flower ends up on relative to the fist direction.
+        # Define axis v=fist_dir unit; thumb side sign uses palm->thumb.
+        palm = palm_center_xy(pts)
+        wrist = pts[0]
+        v = np.array([np.cos(np.radians(fist_dir)), np.sin(np.radians(fist_dir))], dtype=np.float32)
+        thumb_vec = pts[4] - palm
+        thumb_side = side_of_vector(v, thumb_vec)
+
+        # Estimate flower vector after rotation using angle math (in overlay space).
+        # We only need side: take rose_axis direction as where flower points.
+        flower_vec = np.array([np.cos(np.radians(rose_axis)), np.sin(np.radians(rose_axis))], dtype=np.float32)
+        flower_side = side_of_vector(v, flower_vec)
+
+        # If flower is not on the same side as thumb, flip 180°.
+        if thumb_side * flower_side < 0:
+            rot += 180.0
 
         stem_rgba = rotate_and_resize_rgba(stem_rgba0, size_px=size_px, rotation_deg=rot)
         flower_rgba = rotate_and_resize_rgba(flower_rgba0, size_px=size_px, rotation_deg=rot)

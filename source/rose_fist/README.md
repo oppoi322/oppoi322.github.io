@@ -33,10 +33,11 @@ pip install mediapipe==0.10.14 opencv-python numpy pillow
 . .venv/bin/activate
 python src/overlay_rose_on_fist.py \
   --input assets/rock_sample.png \
-  --output outputs/rock_with_rose.png \
-  --rose assets/rose_fluent.png
+  --output outputs/rock_with_real_rose.png \
+  --rose assets/rose_real_cutout.png
 
-# 可选：
+# 也可以使用 emoji 玫瑰（更稳定但不够“真实照片”）：
+# --rose assets/rose_fluent.png
 # --rose assets/rose_twemoji.png
 # --rose assets/rose_openmoji.png
 ```

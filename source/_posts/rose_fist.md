@@ -9,7 +9,7 @@ categories:
   - Projects
 ---
 
-这篇文章介绍我做的 **rose_fist** 小项目：
+这篇文章介绍我做的 **rose_fist** 小项目（已升级为“真实玫瑰照片抠图 + 握持遮挡 + 方向约束”）：
 
 - 当图片中检测到 **握拳（fist/rock）** 时，在拳头（掌心位置附近）叠加一朵玫瑰 PNG，让它看起来像“手里握着玫瑰”。
 - 同时提供一个 **网页端 Demo**：可以在文章网页中上传图片，直接看到效果。
@@ -64,9 +64,16 @@ categories:
 
 ![](/rose_fist/assets/rock_sample.png)
 
-结果（叠加玫瑰：模拟“握住枝条，花朵在外”，并让花朵朝向大拇指方向）：
+结果（叠加玫瑰：
+1) 玫瑰主方向与拳头方向 **垂直（90°）**
+2) 花朵在 **大拇指那一侧**
+3) 枝条被手握住（遮挡））：
 
-- FluentUI Emoji（玫瑰枝条相对更长）：
+![](/rose_fist/site_images/rock_with_real_rose.png)
+
+（本次使用“真实照片 + GrabCut 自动抠图”的玫瑰 cutout 做测试素材：图片来源为 picsum 的 seed=4 随机照片，用于展示管线；若需要指定真实玫瑰照片来源，可替换输入图再生成 cutout。）
+
+（对比：之前“仅花朝向大拇指”的版本）
 
 ![](/rose_fist/site_images/rock_with_rose_held_thumb_fluent.png)
 
