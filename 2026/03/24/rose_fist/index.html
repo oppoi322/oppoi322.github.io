@@ -15,6 +15,8 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/assets/rock_sample.png">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/rock_with_real_rose.png">
+<meta property="og:image" content="https://oppoi322.github.io/rose_fist/assets/rose_photo_source.jpg">
+<meta property="og:image" content="https://oppoi322.github.io/rose_fist/assets/rose_real_cutout.png">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/rock_with_rose_held_thumb_fluent.png">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/rock_with_rose_held_thumb_twemoji.png">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/rock_with_rose.png">
@@ -23,7 +25,7 @@
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/assets/scissors_sample.png">
 <meta property="og:image" content="https://oppoi322.github.io/rose_fist/site_images/scissors_with_rose.png">
 <meta property="article:published_time" content="2026-03-24T04:45:00.000Z">
-<meta property="article:modified_time" content="2026-03-24T08:39:35.022Z">
+<meta property="article:modified_time" content="2026-03-24T08:49:40.761Z">
 <meta property="article:author" content="云爪">
 <meta property="article:tag" content="ComputerVision">
 <meta property="article:tag" content="Demo">
@@ -160,7 +162,15 @@
 <li>枝条被手握住（遮挡））：</li>
 </ol>
 <p><img src="/rose_fist/site_images/rock_with_real_rose.png"></p>
-<p>（本次使用“真实照片 + GrabCut 自动抠图”的玫瑰 cutout 做测试素材：图片来源为 picsum 的 seed&#x3D;4 随机照片，用于展示管线；若需要指定真实玫瑰照片来源，可替换输入图再生成 cutout。）</p>
+<p>玫瑰原始照片（抠图前）：</p>
+<p><img src="/rose_fist/assets/rose_photo_source.jpg"></p>
+<p>抠图后的透明 PNG（用于叠加）：</p>
+<p><img src="/rose_fist/assets/rose_real_cutout.png"></p>
+<p>（本次使用“真实玫瑰照片 + GrabCut 自动抠图”的 cutout 做测试素材：</p>
+<ul>
+<li>来源：eXternOS-Base 仓库内的 <code>legacy/yellow-rose.jpg</code>（真实玫瑰照片，非卡通）</li>
+<li>抠图：<code>src/grabcut_cutout.py</code> 自动生成 <code>assets/rose_real_cutout.png</code>）</li>
+</ul>
 <p>（对比：之前“仅花朝向大拇指”的版本）</p>
 <p><img src="/rose_fist/site_images/rock_with_rose_held_thumb_fluent.png"></p>
 <ul>
@@ -198,7 +208,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://oppoi322.github.io/2026/03/24/rose_fist/" data-id="cuidfri5Nssze5U-zCaGVzKVt" data-title="rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://oppoi322.github.io/2026/03/24/rose_fist/" data-id="cuidmG9Jlr6ZWDs8PMbDuF3j3" data-title="rose_fist：识别握拳并在拳头上 P 一朵玫瑰（含在线 Demo）" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
