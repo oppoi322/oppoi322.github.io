@@ -391,65 +391,79 @@ def process_image(input_path: str, output_path: str, rose_path: str, cfg: FistHe
         fist_dir = fist_direction_deg(pts)
         axes = [fist_dir + 90.0, fist_dir - 90.0]
 
-        # Requirement 2: flower must be on the thumb side.
-        # Determine thumb side relative to fist axis (cross sign).
+        # Requirement 2: flower head must be on the thumb side.
+        # The most direct definition that matches your visual expectation is:
+        #   the flower centroid direction (from the grip point) should have POSITIVE dot
+        #   with the palm->thumb vector (i.e. points towards the thumb half-plane).
+        #
+        # We select among ALL candidates:
+        #   axis ∈ {+90,-90} and flip ∈ {0,180}
+        # by checking where the *flower centroid* ends up.
         palm = palm_center_xy(pts)
-        v = np.array([np.cos(np.radians(fist_dir)), np.sin(np.radians(fist_dir))], dtype=np.float32)
-        thumb_vec = pts[4] - palm
-        thumb_side = side_of_vector(v, thumb_vec)
+        thumb_vec = (pts[4] - palm).astype(np.float32)
 
-        # Choose axis whose direction is closer to thumb direction (same half-plane).
-        thumb_dir = thumb_direction_deg(pts)
-        thumb_unit = np.array([np.cos(np.radians(thumb_dir)), np.sin(np.radians(thumb_dir))], dtype=np.float32)
+        # NOTE: do NOT decide thumb-side using raw unrotated centroids.
+        # Our rotation uses PIL.rotate(..., expand=True) which rotates around image center,
+        # so the anchor/centroid relative geometry changes with expand.
+        #
+        # Therefore we evaluate each candidate by actually rotating/resizing the stem/flower,
+        # then measuring where the flower centroid lands relative to the (rotated) stem anchor.
 
-        best_axis = axes[0]
-        best_score = -1e9
-        for ax in axes:
-            u = np.array([np.cos(np.radians(ax)), np.sin(np.radians(ax))], dtype=np.float32)
-            score = float(np.dot(u, thumb_unit))
-            if score > best_score:
-                best_score = score
-                best_axis = ax
+        def eval_candidate(rot_deg: float) -> tuple[float, np.ndarray, np.ndarray]:
+            stem_r = rotate_and_resize_rgba(stem_rgba0, size_px=size_px, rotation_deg=rot_deg)
+            flower_r = rotate_and_resize_rgba(flower_rgba0, size_px=size_px, rotation_deg=rot_deg)
 
-        rose_axis = best_axis
+            ax_r, ay_r = find_anchor_bottom(stem_r)
+            fcen = alpha_centroid_xy(flower_r)
+            scen = alpha_centroid_xy(stem_r)
 
-        # Align flower direction to chosen rose_axis.
-        # But decide between rot and rot+180 by checking where the flower *centroid* lands.
-        rot0 = rose_axis - flower_dir0
+            score = 0.0
 
-        flower_centroid0 = alpha_centroid_xy(flower_rgba0)
-        if flower_centroid0 is None:
-            rot = rot0
+            if fcen is not None:
+                fc = np.array([fcen[0] - ax_r, fcen[1] - ay_r], dtype=np.float32)
+                flower_to_thumb = float(np.dot(fc, thumb_vec))
+                if flower_to_thumb > 0:
+                    score += 100.0
+                else:
+                    score -= 100.0
+                score += 0.01 * flower_to_thumb
+
+            if scen is not None:
+                sc = np.array([scen[0] - ax_r, scen[1] - ay_r], dtype=np.float32)
+                stem_to_thumb = float(np.dot(sc, thumb_vec))
+                if stem_to_thumb < 0:
+                    score += 10.0
+                else:
+                    score -= 10.0
+
+            return score, stem_r, flower_r
+
+        best = None
+        best_stem = None
+        best_flower = None
+
+        for axis in axes:
+            base = axis - flower_dir0
+            for flip in (0.0, 180.0):
+                rot_cand = base + flip
+                score, stem_r, flower_r = eval_candidate(rot_cand)
+
+                cand = (score, rot_cand, axis)
+                if (best is None) or (cand[0] > best[0]):
+                    best = cand
+                    best_stem = stem_r
+                    best_flower = flower_r
+
+        # fallback (should not happen): just keep the basic perpendicular axis
+        if best is None:
+            rose_axis = axes[0]
+            rot = rose_axis - flower_dir0
+            stem_rgba = rotate_and_resize_rgba(stem_rgba0, size_px=size_px, rotation_deg=rot)
+            flower_rgba = rotate_and_resize_rgba(flower_rgba0, size_px=size_px, rotation_deg=rot)
         else:
-            # vector (in rose image coords) from stem anchor to flower centroid
-            fc0 = np.array(
-                [flower_centroid0[0] - stem_anchor0[0], flower_centroid0[1] - stem_anchor0[1]],
-                dtype=np.float32,
-            )
-
-            def side_after(rot_deg: float) -> float:
-                th = np.radians(rot_deg)
-                c, s = float(np.cos(th)), float(np.sin(th))
-                R = np.array([[c, -s], [s, c]], dtype=np.float32)
-                fc = R @ fc0
-                return side_of_vector(v, fc)
-
-            side0 = side_after(rot0)
-            side1 = side_after(rot0 + 180.0)
-
-            # Choose the rotation that puts the flower centroid on the same side as the thumb.
-            # If ambiguous, keep rot0.
-            if thumb_side == 0:
-                rot = rot0
-            elif thumb_side * side0 > 0:
-                rot = rot0
-            elif thumb_side * side1 > 0:
-                rot = rot0 + 180.0
-            else:
-                rot = rot0
-
-        stem_rgba = rotate_and_resize_rgba(stem_rgba0, size_px=size_px, rotation_deg=rot)
-        flower_rgba = rotate_and_resize_rgba(flower_rgba0, size_px=size_px, rotation_deg=rot)
+            _score, rot, rose_axis = best
+            stem_rgba = best_stem
+            flower_rgba = best_flower
 
         # Anchor the stem bottom to the palm center to create "held" illusion.
         ax, ay = find_anchor_bottom(stem_rgba)
