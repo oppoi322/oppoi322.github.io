@@ -85,6 +85,53 @@ def load_rgba(path: str) -> np.ndarray:
     return np.array(img)
 
 
+def split_rose_stem_flower(rose_rgba: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Split a rose RGBA into (stem_rgba, flower_rgba).
+
+    We treat "green-ish" pixels as stem/leaves, and the rest as flower.
+    This is a heuristic that works well for emoji-style roses (e.g. Twemoji).
+    """
+    rgba = rose_rgba.copy()
+    rgb = rgba[..., :3].astype(np.float32)
+    a = rgba[..., 3:4].astype(np.float32)
+
+    # Convert to HSV-ish via OpenCV for robust green detection.
+    bgr = rgb[..., ::-1].astype(np.uint8)
+    hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+
+    # green range (tunable)
+    lower = np.array([35, 40, 40], dtype=np.uint8)
+    upper = np.array([95, 255, 255], dtype=np.uint8)
+    green_mask = cv2.inRange(hsv, lower, upper).astype(bool)
+
+    stem = rgba.copy()
+    flower = rgba.copy()
+
+    # Stem keeps only green pixels
+    stem_alpha = (a[..., 0] > 0) & green_mask
+    stem[..., 3] = np.where(stem_alpha, stem[..., 3], 0)
+
+    # Flower keeps everything except green pixels
+    flower_alpha = (a[..., 0] > 0) & (~green_mask)
+    flower[..., 3] = np.where(flower_alpha, flower[..., 3], 0)
+
+    return stem, flower
+
+
+def find_anchor_bottom(overlay_rgba: np.ndarray) -> tuple[int, int]:
+    """Find a bottom-most non-transparent pixel as anchor (x,y) within overlay image."""
+    alpha = overlay_rgba[..., 3]
+    ys, xs = np.where(alpha > 0)
+    if len(xs) == 0:
+        # fallback to bottom center
+        h, w = overlay_rgba.shape[:2]
+        return w // 2, h - 1
+    y = int(ys.max())
+    xs_at_y = xs[ys == y]
+    x = int(np.median(xs_at_y))
+    return x, y
+
+
 def alpha_blend_rgba(bg_bgr: np.ndarray, fg_rgba: np.ndarray, x: int, y: int) -> np.ndarray:
     """Alpha blend fg_rgba onto bg_bgr with fg's top-left at (x,y)."""
     out = bg_bgr.copy()
@@ -117,7 +164,7 @@ def alpha_blend_rgba(bg_bgr: np.ndarray, fg_rgba: np.ndarray, x: int, y: int) ->
 
 
 def rose_overlay_pose(pts_xy: np.ndarray, image_shape: Tuple[int, int]) -> Tuple[Tuple[int, int], int, float]:
-    """Heuristic placement:
+    """Heuristic placement for holding a rose.
 
     Returns:
       center (cx,cy), size_px, rotation_deg
@@ -137,16 +184,43 @@ def rose_overlay_pose(pts_xy: np.ndarray, image_shape: Tuple[int, int]) -> Tuple
     bbox_h = float(ys.max() - ys.min())
     hand_size = max(bbox_w, bbox_h)
 
-    # rose roughly the palm size
-    size_px = int(max(32, min(0.9 * hand_size, 0.8 * min(W, H))))
+    # rose roughly the palm size; slightly larger for better illusion
+    size_px = int(max(32, min(1.05 * hand_size, 0.9 * min(W, H))))
 
-    # rotation: align rose with forearm direction
+    # rotation: align with forearm direction
     middle_mcp = pts_xy[9]
     v = middle_mcp - wrist
     rot = float(np.degrees(np.arctan2(v[1], v[0])))
 
     cx, cy = int(palm[0]), int(palm[1])
     return (cx, cy), size_px, rot
+
+
+def fist_occlusion_mask_from_bbox(img_shape: Tuple[int, int], pts_xy: np.ndarray) -> np.ndarray:
+    """Create an approximate occlusion mask for the fist region.
+
+    This is a *heuristic* that uses the landmarks bbox as the hand area.
+    We erode it a bit to simulate the interior part of the fist that should occlude the stem.
+
+    Returns uint8 mask 0/255.
+    """
+    H, W = img_shape
+    xs = pts_xy[:, 0]
+    ys = pts_xy[:, 1]
+    x0, y0 = int(max(0, xs.min())), int(max(0, ys.min()))
+    x1, y1 = int(min(W - 1, xs.max())), int(min(H - 1, ys.max()))
+
+    mask = np.zeros((H, W), dtype=np.uint8)
+    cv2.rectangle(mask, (x0, y0), (x1, y1), 255, thickness=-1)
+
+    # erode to get inner region (more conservative)
+    k = max(3, int(0.08 * max(x1 - x0, y1 - y0)))
+    if k % 2 == 0:
+        k += 1
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))
+    mask = cv2.erode(mask, kernel, iterations=1)
+
+    return mask
 
 
 def rotate_and_resize_rgba(img_rgba: np.ndarray, size_px: int, rotation_deg: float) -> np.ndarray:
@@ -194,12 +268,48 @@ def process_image(input_path: str, output_path: str, rose_path: str, cfg: FistHe
     if is_fist:
         rose_rgba = load_rgba(rose_path)
         (cx, cy), size_px, rot = rose_overlay_pose(pts, out.shape[:2])
-        rose2 = rotate_and_resize_rgba(rose_rgba, size_px=size_px, rotation_deg=rot)
 
-        # place centered
-        x = int(cx - rose2.shape[1] / 2)
-        y = int(cy - rose2.shape[0] / 2)
-        out = alpha_blend_rgba(out, rose2, x, y)
+        # Prepare rose layers: stem (green) and flower (non-green)
+        stem_rgba0, flower_rgba0 = split_rose_stem_flower(rose_rgba)
+        stem_rgba = rotate_and_resize_rgba(stem_rgba0, size_px=size_px, rotation_deg=rot)
+        flower_rgba = rotate_and_resize_rgba(flower_rgba0, size_px=size_px, rotation_deg=rot)
+
+        # Anchor the stem bottom to the palm center to create "held" illusion.
+        ax, ay = find_anchor_bottom(stem_rgba)
+
+        # Top-left so that anchor lands at (cx,cy)
+        x = int(cx - ax)
+        y = int(cy - ay)
+
+        # 1) draw stem first
+        out1 = alpha_blend_rgba(out, stem_rgba, x, y)
+
+        # 2) occlude stem by fist region (approx mask)
+        occ = fist_occlusion_mask_from_bbox(out.shape[:2], pts)
+        # apply occlusion only in overlapping region of stem
+        H, W = out.shape[:2]
+        fh, fw = stem_rgba.shape[:2]
+        x0 = max(0, x)
+        y0 = max(0, y)
+        x1 = min(W, x + fw)
+        y1 = min(H, y + fh)
+        if x0 < x1 and y0 < y1:
+            fx0 = x0 - x
+            fy0 = y0 - y
+            fx1 = fx0 + (x1 - x0)
+            fy1 = fy0 + (y1 - y0)
+            stem_alpha = stem_rgba[fy0:fy1, fx0:fx1, 3]
+            occ_roi = occ[y0:y1, x0:x1]
+            # where occlusion is on, reduce stem visibility by setting those pixels back to original out
+            # (simple but effective)
+            m = (stem_alpha > 0) & (occ_roi > 0)
+            out1_roi = out1[y0:y1, x0:x1]
+            orig_roi = out[y0:y1, x0:x1]
+            out1_roi[m] = orig_roi[m]
+            out1[y0:y1, x0:x1] = out1_roi
+
+        # 3) draw flower on top (outside the fist)
+        out = alpha_blend_rgba(out1, flower_rgba, x, y)
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     cv2.imwrite(output_path, out)
