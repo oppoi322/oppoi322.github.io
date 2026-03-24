@@ -69,15 +69,33 @@ categories:
 2) 花朵在 **大拇指那一侧**
 3) 枝条被手握住（遮挡））：
 
+## 你选择的玫瑰素材（版本 1）
+
+最终效果：
+
 ![](/rose_fist/site_images/rock_with_user_rose.png)
 
-你选择的玫瑰原图（抠图前）：
+原图（抠图前）：
 
 ![](/rose_fist/assets/rose_user_selected.jpg)
 
-GrabCut 自动抠图后的透明 PNG（用于叠加）：
+GrabCut 自动抠图后的透明 PNG：
 
 ![](/rose_fist/assets/rose_user_selected_cutout.png)
+
+## 你选择的玫瑰素材（版本 2）
+
+最终效果：
+
+![](/rose_fist/site_images/rock_with_user_rose2.png)
+
+原图（抠图前）：
+
+![](/rose_fist/assets/rose_user_selected2.jpg)
+
+GrabCut 自动抠图后的透明 PNG：
+
+![](/rose_fist/assets/rose_user_selected2_cutout.png)
 
 （本次使用“你选择的玫瑰照片 + GrabCut 自动抠图”的 cutout 做测试素材：
 - 原图：`assets/rose_user_selected.jpg`
