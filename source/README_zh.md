@@ -1,0 +1,80 @@
+# FastSAM3D 评测指南
+
+## 📦 评测数据集
+
+* **iso3d 官方数据集**：[下载链接](https://huggingface.co/datasets/dylanebert/iso3d/tree/main)
+* **toys600**：（一个 toy4k 的子集，FastSAM3D 评测使用），是一个单视角采样物体的数据集。
+  * 包含了 1000 个物体建模，以及 600 个单视角物体的 jpg 和 png。
+  ==* 下载链接：（后面会传上 HuggingFace，目前在 21 号服务器中的 `/data3/wmq2/data_set_end/toys600`）==
+
+> **💡 评测数据放置说明**
+> 掩码 png 图像与 mesh 模型请分别放在以下路径：
+> * `example_data/png@1024`
+> * `example_data/MESH`
+
+---
+
+## 🗂️ 模型权重配置
+
+### 1. Uni3D
+需要下载两个模型权重，一个是 clip（一个 bin 文件），一个是 uni3d 的权重（一个 pt 文件），请放在 uni3d 评测中的 `uni3d` 文件夹中。
+* **clip 权重链接**：[open_clip_pytorch_model.bin](https://huggingface.co/timm/eva02_enormous_patch14_plus_clip_224.laion2b_s9b_b144k/blob/main/open_clip_pytorch_model.bin)
+* **uni3d 权重链接**：[ModelZoo](https://huggingface.co/BAAI/Uni3D/tree/main/modelzoo)
+
+### 2. ULIP
+需要下载一个 ulip 模型权重，放在 uni3d 评测中的 `/ulip/ULIP/pre_models` 文件夹中。
+* **Ulip 预训练模型链接**：[ckpt_zero-shot_classification](https://huggingface.co/datasets/SFXX/ulip/tree/main/ULIP-1/pretrained_models/ckpt_zero-sho_classification)
+* *注：我们的评测使用的预训练模型是 `checkpoint_pointbert.pt`。若需要更换模型，你需要更改 `ulip_score.py` 中的 `ckpt_path` 指定路径。*
+
+---
+
+## 🛠️ 在 conda 下安装 ULIP 环境
+
+### 1. 创建 Conda 环境
+```bash
+conda create -n ulip_env python=3.7.12
+conda activate ulip_env
+export PYTHONNOUSERSITE=1
+```
+
+### 2. 安装完整 CUDA 编译环境
+```bash
+conda install -c conda-forge gxx_linux-64=7.5.0 gcc_linux-64=7.5.0
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1+cu113 --extra-index-url [https://download.pytorch.org/whl/cu113](https://download.pytorch.org/whl/cu113)
+```
+
+### 3. 安装常规依赖库
+```bash
+pip install -r requirements.txt
+```
+
+### 4. 本地编译 pointnet2_ops 环境
+进入pointnet2_ops源码目录：
+```bash
+cd pointnet2_ops-main/
+```
+
+**【注意】编译前务必对齐显卡架构：**
+我们的评测平台搭载的显卡是 A100/A800，使用 Ampere 架构。对应兼容的 `TORCH_CUDA_ARCH_LIST` 是 `8.0`。
+你可以在**当前的 `setup.py` 文件中**修改评测代码 `TORCH_CUDA_ARCH_LIST` 的版本，这个版本需要与你的硬件对应。
+* 如果你使用其他类型的显卡，请注意架构对应问题（如 Ada Lovelace 架构对应 `TORCH_CUDA_ARCH_LIST` 是 `8.9`，这个架构不兼容 PyTorch 1.12）。
+* 但是高版本硬件可以向下兼容，你可以降低 `TORCH_CUDA_ARCH_LIST` 版本，Ada Lovelace 架构可以使用 `TORCH_CUDA_ARCH_LIST=8.0` 版本。
+* *(PyTorch 1.12 可兼容的 TORCH_CUDA_ARCH_LIST 版本有 7.0、7.5、8.0、8.6)*
+
+编译pointnet2_ops：
+```bash
+pip install .
+```
+
+### 5. 固化隔离环境变量
+```bash
+mkdir -p $CONDA_PREFIX/etc/conda/activate.d
+mkdir -p $CONDA_PREFIX/etc/conda/deactivate.d
+echo 'export PYTHONNOUSERSITE=1' > $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo 'unset PYTHONNOUSERSITE' > $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
+```
+
+---
+**遇到了问题？**
+
+如果遇到问题请向我们提出 issue！
